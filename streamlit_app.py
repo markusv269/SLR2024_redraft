@@ -1,6 +1,6 @@
 import streamlit as st
 
-st.title("🎈 My new app")
+st.title("SL Redraft 2024 -- Wochenauswertung :football:")
 st.write(
-    "Let's start building! For help and inspiration, head over to [docs.streamlit.io](https://docs.streamlit.io/)."
+    "Wöchentlicher Überblick über die SLR 2024. 35 Ligen, 420 Manager, eine App."
 )
