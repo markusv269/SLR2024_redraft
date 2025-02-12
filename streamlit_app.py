@@ -8,4 +8,4 @@ st.subheader(
 st.write("Ankündigungen, Infos, Tipps auf Discord.")
 
 
-# st.logo("Pictures/SL_logo.png", link=None, size='medium')
+st.logo("Pictures/SL_logo.png", link=None, size='medium')
