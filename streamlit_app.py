@@ -1,5 +1,6 @@
 import streamlit as st
 from modules.matchups import get_matchups
+import pandas as pd
 
 slr_league_ids = ['1127181027346161664', 
                   '1127182827986018304', 
@@ -68,6 +69,46 @@ elif menu_option == "📊 Matchups":
     st.dataframe(filtered_df,hide_index=True)
 
 elif menu_option == "⚙️ Einstellungen":
-    st.title("Einstellungen")
-    st.write("Hier gibt es verschiedene Optionen.")
-    st.write('Test.')
+    # Beispiel-Datenframe
+    df = pd.DataFrame({
+        'Name': ['Alice', 'Bob', 'Charlie', 'David'],
+        'Alter': [25, 30, 35, 40],
+        'Stadt': ['Berlin', 'München', 'Hamburg', 'Berlin']
+    })
+
+    st.title("Dynamische Filter für DataFrame")
+
+    # Session-State für Filter
+    if "filters" not in st.session_state:
+        st.session_state.filters = []
+
+    # Funktion zur Anwendung der Filter
+    def apply_filters(df, filters):
+        for f in filters:
+            column, value = f
+            df = df[df[column] == value]  # Hier kannst du weitere Bedingungen anpassen
+        return df
+
+    # Filter-Container
+    with st.expander("Filteroptionen"):
+        # Auswahl der Spalte
+        column = st.selectbox("Spalte wählen", df.columns, key="column_select")
+
+        # Passende Filteroption je nach Datentyp
+        if df[column].dtype == 'O':  # Objekt (String)
+            value = st.selectbox("Wert wählen", df[column].unique(), key="value_select")
+        else:  # Numerisch
+            value = st.slider("Wert wählen", int(df[column].min()), int(df[column].max()), key="value_slider")
+
+        # Filter hinzufügen
+        if st.button("Filter hinzufügen"):
+            st.session_state.filters.append((column, value))
+
+    # Gefiltertes DataFrame anzeigen
+    filtered_df = apply_filters(df, st.session_state.filters)
+    st.write(filtered_df)
+
+    # Möglichkeit, alle Filter zurückzusetzen
+    if st.button("Alle Filter zurücksetzen"):
+        st.session_state.filters = []
+        st.experimental_rerun()
