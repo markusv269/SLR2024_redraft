@@ -9,7 +9,7 @@ st.logo("Pictures/SL_logo.png", link=None, size='large')
 # print(max_week)
 
 st.sidebar.title("Navigation")
-menu_option = st.sidebar.selectbox("Wähle eine Seite:", ["🏠 Start", "📊 Matchups", "⚙️ Einstellungen"])
+menu_option = st.sidebar.selectbox("Wähle eine Seite:", ["Start", "Matchups", "Wochenkategorien"])
 
 if menu_option == "🏠 Start":
     st.title("Stoned Lack Redraft 2024 -- Wochenauswertung :football:")
@@ -34,47 +34,70 @@ elif menu_option == "📊 Matchups":
     filtered_df = matchups_show[matchups_show[selected_column] == selected_value]
     st.dataframe(filtered_df,hide_index=True)
 
-elif menu_option == "⚙️ Einstellungen":
-    # Beispiel-Datenframe
-    df = pd.DataFrame({
-        'Name': ['Alice', 'Bob', 'Charlie', 'David'],
-        'Alter': [25, 30, 35, 40],
-        'Stadt': ['Berlin', 'München', 'Hamburg', 'Berlin']
-    })
+elif menu_option == "Wochenkategorien":
+    week_df = pd.read_parquet('league_stats/matchups/matchups.parquet', engine='pyarrow')
+    select_week = st.selectbox("Woche auswählen", week_df['week'].unique())
 
-    st.title("Dynamische Filter für DataFrame")
+    week_df = week_df[week_df['week'] == select_week]
 
-    # Session-State für Filter
-    if "filters" not in st.session_state:
-        st.session_state.filters = []
+    st.subheader('Shootout der Woche')
+    if select_week != None:
+        shootout_df = week_df.groupby(['league_id', 'matchup_id']).sum('points').reset_index()
+        st.dataframe(shootout_df.sort_values(by='points', ascending=False).head(1),hide_index=True)
 
-    # Funktion zur Anwendung der Filter
-    def apply_filters(df, filters):
-        for f in filters:
-            column, value = f
-            df = df[df[column] == value]  # Hier kannst du weitere Bedingungen anpassen
-        return df
+    st.subheader('Klatsche der Woche')
+    if select_week != None:
+        klatsche_df = week_df.groupby(['league_id', 'matchup_id'])['points'].agg(lambda x: x.max() - x.min()).reset_index()
+        st.dataframe(klatsche_df.sort_values(by='points', ascending=False).head(1),hide_index=True)
+    
+    st.subheader('Nailbiter der Woche')
+    if select_week != None:
+        st.dataframe(klatsche_df.sort_values(by='points', ascending=True).head(1),hide_index=True)
+    
+    st.subheader('Top 5 Roster')
+    if select_week != None:
+        st.dataframe(week_df[['points', 'league_id', 'starters']].sort_values(by='points', ascending=False).head(5),hide_index=True)
 
-    # Filter-Container
-    with st.expander("Filteroptionen"):
-        # Auswahl der Spalte
-        column = st.selectbox("Spalte wählen", df.columns, key="column_select")
+    # # Beispiel-Datenframe
+    # df = pd.DataFrame({
+    #     'Name': ['Alice', 'Bob', 'Charlie', 'David'],
+    #     'Alter': [25, 30, 35, 40],
+    #     'Stadt': ['Berlin', 'München', 'Hamburg', 'Berlin']
+    # })
 
-        # Passende Filteroption je nach Datentyp
-        if df[column].dtype == 'O':  # Objekt (String)
-            value = st.selectbox("Wert wählen", df[column].unique(), key="value_select")
-        else:  # Numerisch
-            value = st.slider("Wert wählen", int(df[column].min()), int(df[column].max()), key="value_slider")
+    # st.title("Dynamische Filter für DataFrame")
 
-        # Filter hinzufügen
-        if st.button("Filter hinzufügen"):
-            st.session_state.filters.append((column, value))
+    # # Session-State für Filter
+    # if "filters" not in st.session_state:
+    #     st.session_state.filters = []
 
-    # Gefiltertes DataFrame anzeigen
-    filtered_df = apply_filters(df, st.session_state.filters)
-    st.write(filtered_df)
+    # # Funktion zur Anwendung der Filter
+    # def apply_filters(df, filters):
+    #     for f in filters:
+    #         column, value = f
+    #         df = df[df[column] == value]  # Hier kannst du weitere Bedingungen anpassen
+    #     return df
 
-    # Möglichkeit, alle Filter zurückzusetzen
-    if st.button("Alle Filter zurücksetzen"):
-        st.session_state.filters = []
-        st.experimental_rerun()
+    # # Filter-Container
+    # with st.expander("Filteroptionen"):
+    #     # Auswahl der Spalte
+    #     column = st.selectbox("Spalte wählen", df.columns, key="column_select")
+
+    #     # Passende Filteroption je nach Datentyp
+    #     if df[column].dtype == 'O':  # Objekt (String)
+    #         value = st.selectbox("Wert wählen", df[column].unique(), key="value_select")
+    #     else:  # Numerisch
+    #         value = st.slider("Wert wählen", int(df[column].min()), int(df[column].max()), key="value_slider")
+
+    #     # Filter hinzufügen
+    #     if st.button("Filter hinzufügen"):
+    #         st.session_state.filters.append((column, value))
+
+    # # Gefiltertes DataFrame anzeigen
+    # filtered_df = apply_filters(df, st.session_state.filters)
+    # st.write(filtered_df)
+
+    # # Möglichkeit, alle Filter zurückzusetzen
+    # if st.button("Alle Filter zurücksetzen"):
+    #     st.session_state.filters = []
+    #     st.experimental_rerun()
