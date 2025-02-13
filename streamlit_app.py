@@ -70,3 +70,4 @@ elif menu_option == "📊 Matchups":
 elif menu_option == "⚙️ Einstellungen":
     st.title("Einstellungen")
     st.write("Hier gibt es verschiedene Optionen.")
+    st.write('Test.')
