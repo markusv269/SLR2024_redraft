@@ -4,6 +4,8 @@ import os
 import pyarrow.parquet as pq
 import pyarrow as pa
 
+actual_week = 17
+
 slr_league_ids = ['1127181027346161664', 
                   '1127182827986018304', 
                   '1127186511226687488', 
@@ -39,7 +41,7 @@ slr_league_ids = ['1127181027346161664',
                   '1131892079992414208', 
                   '1132672171618217984', 
                   '1134223442955550720']
-weeks = list(range(1,18))
+weeks = list(range(1,actual_week + 1))
 
 matchups_df = pd.DataFrame()
 for league_id in slr_league_ids:
