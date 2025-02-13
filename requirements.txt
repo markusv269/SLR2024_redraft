@@ -1,6 +1,5 @@
 streamlit
 matplotlib
 pandas
-os
 seaborn
 pyarrow
