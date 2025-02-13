@@ -1,5 +1,5 @@
 import streamlit as st
-from matchups import matchups_df
+from modules.matchups import matchups_df
 
 st.title("Stoned Lack Redraft 2024 -- Wochenauswertung :football:")
 st.subheader(
