@@ -111,4 +111,4 @@ elif menu_option == "📅 Wochenkategorien":
         top_roster_df = week_df[['points', 'league_id', 'starters']].sort_values(by='points', ascending=False).head(5)
         st.dataframe(top_roster_df, hide_index=True)
     else:
-        st.warning("Keine Daten für die ausgewählte Woche verfügbar. ")
+        st.warning("Keine Daten für die ausgewählte Woche verfügbar.")
