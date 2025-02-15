@@ -59,6 +59,7 @@ elif menu_option == "📊 Matchups":
 
     # Annahme: matchups_show ist bereits definiert
     columns = matchups_show.columns.tolist()
+    columns.remove('players')
 
     selected_column1 = st.selectbox("Filtern nach...", columns)
 
