@@ -46,7 +46,7 @@ weeks = list(range(1,actual_week + 1))
 matchups_df = pd.DataFrame()
 for league_id in slr_league_ids:
     for week in weeks:
-        file_path = f"league_stats/matchups/{week}/{league_id}.json"
+        file_path = f"league_stats/rosters/{week}/{league_id}.json"
         
         if os.path.exists(file_path):
             with open(file_path, "r") as file:
@@ -63,4 +63,4 @@ for league_id in slr_league_ids:
                 matchups_df = pd.concat([matchups_df, temp_df], ignore_index=True)
 
 table = pa.Table.from_pandas(matchups_df)
-pq.write_table(table, 'league_stats/matchups/matchups.parquet')
+pq.write_table(table, 'league_stats/rosters/rosters.parquet')

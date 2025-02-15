@@ -3,6 +3,8 @@ import pandas as pd
 import pyarrow.parquet as pq
 import matplotlib.pyplot as plt
 import seaborn as sns
+import ast
+import numpy as np
 
 # --- Streamlit-Setup ---
 st.set_page_config(page_title="SLR 2024 Dashboard", layout="wide")
@@ -12,14 +14,25 @@ st.image("Pictures/SL_logo.png", width=150)
 @st.cache_data
 def load_matchups():
     return pd.read_parquet('league_stats/matchups/matchups.parquet', engine='pyarrow')
-# def load_
+def load_rosters():
+    rosters = pd.read_parquet('league_stats/rosters/rosters.parquet', engine='pyarrow')
+    rosters['starters'] = rosters['starters'].apply(lambda x: x.tolist() if isinstance(x, np.ndarray) else x)
+    rosters[['QB', 'RB1', 'RB2', 'WR1', 'WR2', 'TE', 'FL', 'K', 'DEF']] = pd.DataFrame(rosters['starters'].to_list(), index=rosters.index)
+    return rosters
+def load_users():
+    users = pd.read_parquet('league_stats/users.parquet', engine='pyarrow')
+    return users
 
 
 matchups_df = load_matchups()
+rosters_df = load_rosters()
+users_df = load_users()
+
+rosters_df = rosters_df.merge(users_df[['display_name', 'league_name', 'league_id', 'roster_id']], on=['league_id', 'roster_id'], how='left')
 
 # --- Sidebar Navigation ---
 st.sidebar.title("Navigation")
-menu_option = st.sidebar.selectbox("Wähle eine Seite:", ["🏠 Start", "📊 Matchups", "📅 Wochenkategorien"])
+menu_option = st.sidebar.selectbox("Wähle eine Seite:", ["🏠 Start", "📊 Matchups", "📅 Wochenkategorien", "📋 Roster", "👨‍👨‍👧‍👦 Users"])
 
 # --- Startseite ---
 if menu_option == "🏠 Start":
@@ -30,6 +43,8 @@ if menu_option == "🏠 Start":
 # --- Matchups ---
 elif menu_option == "📊 Matchups":
     st.title("Wöchentliche Matchups")
+
+    # matches = matchups_df.groupby(['league_id', 'week', 'matchup_id'])
     
     # Unnötige Spalten entfernen und Spaltennamen umbenennen
     matchups_show = matchups_df[~matchups_df['matchup_id'].isin([0, None])]
@@ -44,18 +59,16 @@ elif menu_option == "📊 Matchups":
         'league_id': 'League-ID'
     })
 
-    # Barplot für min, max und durchschnittliche Punkte pro Woche
-    st.subheader("📊 Punkteverteilung pro Woche")
-    stats_df = matchups_df[~matchups_df['matchup_id'].isin([0, None])].groupby("week")["points"].agg(["min", "mean", "max"]).reset_index()
+    # # Barplot für min, max und durchschnittliche Punkte pro Woche
+    # st.subheader("📊 Punkteverteilung pro Woche")
+    # stats_df = matchups_df[~matchups_df['matchup_id'].isin([0, None])].groupby("week")["points"].agg(["min", "mean", "max"]).reset_index()
     
-    fig, ax = plt.subplots(figsize=(10, 3))
-    sns.barplot(data=stats_df.melt(id_vars="week", var_name="Stat", value_name="Wert"), x="week", y="Wert", hue="Stat", ax=ax)
-    # ax.set_title("Minimal, Maximal und Durchschnittlich erzielte Punkte pro Woche")
-    ax.set_xlabel("Woche")
-    ax.set_ylabel("Punkte")
-    st.pyplot(fig)
-
-    import streamlit as st
+    # fig, ax = plt.subplots(figsize=(10, 3))
+    # sns.barplot(data=stats_df.melt(id_vars="week", var_name="Stat", value_name="Wert"), x="week", y="Wert", hue="Stat", ax=ax)
+    # # ax.set_title("Minimal, Maximal und Durchschnittlich erzielte Punkte pro Woche")
+    # ax.set_xlabel("Woche")
+    # ax.set_ylabel("Punkte")
+    # st.pyplot(fig)
 
     # Annahme: matchups_show ist bereits definiert
     columns = matchups_show.columns.tolist()
@@ -82,7 +95,7 @@ elif menu_option == "📊 Matchups":
         else:
             filtered_df = matchups_show[matchups_show[selected_column1] == selected_value1]
 
-        st.dataframe(filtered_df, hide_index=True)
+    st.dataframe(filtered_df, hide_index=True)
 
 
 # --- Wochenkategorien ---
@@ -113,3 +126,27 @@ elif menu_option == "📅 Wochenkategorien":
         st.dataframe(top_roster_df, hide_index=True)
     else:
         st.warning("Keine Daten für die ausgewählte Woche verfügbar.")
+
+elif menu_option == "📋 Roster":
+    st.title("Roster")
+
+    st.dataframe(rosters_df, hide_index=True)
+
+elif menu_option == "👨‍👨‍👧‍👦 Users":
+    st.title('SLR Manager')
+
+    # st.selectbox()
+    user_show = users_df[['league_name', 'display_name', 'roster_id', 'draft_pos']]
+    user_show = user_show.rename(columns={
+        'league_name': 'Liga',
+        'display_name': 'Manager',
+        'roster_id': 'Roster-ID',
+        'draft_pos': 'Draftposition'
+    })
+    selected_leagues = st.multiselect("Ligen auswählen:", user_show['Liga'].unique(), default=[])
+
+    # Falls keine Liga ausgewählt ist, zeige den gesamten DataFrame
+    filtered_df = user_show if not selected_leagues else user_show[user_show['Liga'].isin(selected_leagues)]
+
+    # Dataframe anzeigen
+    st.dataframe(filtered_df, hide_index=True)
