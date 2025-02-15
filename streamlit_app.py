@@ -30,18 +30,18 @@ users_df = load_users()
 
 rosters_df = rosters_df.merge(users_df[['display_name', 'league_name', 'league_id', 'roster_id']], on=['league_id', 'roster_id'], how='left')
 
-# --- Sidebar Navigation ---
-st.sidebar.title("Navigation")
-menu_option = st.sidebar.selectbox("Wähle eine Seite:", ["🏠 Start", "📊 Matchups", "📅 Wochenkategorien", "📋 Roster", "👨‍👨‍👧‍👦 Users"])
+# # --- Sidebar Navigation ---
+# st.sidebar.title("Navigation")
+tab1,tab2,tab3,tab4,tab5 = st.tabs(["🏠 Start", "📊 Matchups", "📅 Wochenkategorien", "📋 Roster", "👨‍👨‍👧‍👦 Users"])
 
 # --- Startseite ---
-if menu_option == "🏠 Start":
+with tab1:
     st.title("Stoned Lack Redraft 2024 -- Wochenauswertung :football:")
     st.subheader("Wöchentlicher Überblick über die SLR 2024. 35 Ligen, 420 Manager, eine App.")
     st.write("Ankündigungen, Infos, Tipps auf dem Stoned Lack [Discord-Server](https://discord.gg/V9pt9MZ6Ch).")
 
 # --- Matchups ---
-elif menu_option == "📊 Matchups":
+with tab2:
     st.title("Wöchentliche Matchups")
 
     # matches = matchups_df.groupby(['league_id', 'week', 'matchup_id'])
@@ -99,7 +99,7 @@ elif menu_option == "📊 Matchups":
 
 
 # --- Wochenkategorien ---
-elif menu_option == "📅 Wochenkategorien":
+with tab3:
     st.title("Wochenkategorien")
     
     if not matchups_df.empty:
@@ -127,12 +127,12 @@ elif menu_option == "📅 Wochenkategorien":
     else:
         st.warning("Keine Daten für die ausgewählte Woche verfügbar.")
 
-elif menu_option == "📋 Roster":
+with tab4:
     st.title("Roster")
 
     st.dataframe(rosters_df, hide_index=True)
 
-elif menu_option == "👨‍👨‍👧‍👦 Users":
+with tab5:
     st.title('SLR Manager')
 
     # st.selectbox()
