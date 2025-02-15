@@ -8,7 +8,6 @@ import numpy as np
 
 # --- Streamlit-Setup ---
 st.set_page_config(page_title="SLR 2024 Dashboard", layout="wide")
-st.image("Pictures/SL_logo.png", width=150)
 
 # --- Daten laden mit Caching ---
 @st.cache_data
@@ -33,7 +32,7 @@ rosters_df = rosters_df.merge(users_df[['display_name', 'league_name', 'league_i
 # # --- Sidebar Navigation ---
 # st.sidebar.title("Navigation")
 tab1,tab2,tab3,tab4,tab5 = st.tabs(["🏠 Start", "📊 Matchups", "📅 Wochenkategorien", "📋 Roster", "👨‍👨‍👧‍👦 Users"])
-
+st.image("Pictures/SL_logo.png", width=150)
 # --- Startseite ---
 with tab1:
     st.title("Stoned Lack Redraft 2024 -- Wochenauswertung :football:")
