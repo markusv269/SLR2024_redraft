@@ -1,15 +1,14 @@
 import streamlit as st
 import pandas as pd
-import pyarrow.parquet as pq
-import matplotlib.pyplot as plt
-import seaborn as sns
-import ast
+# import pyarrow.parquet as pq
+# import matplotlib.pyplot as plt
+# import seaborn as sns
+# import ast
 import numpy as np
 
 # --- Streamlit-Setup ---
 st.set_page_config(page_title="SLR 2024 Dashboard", layout="wide")
 tab1,tab2,tab3,tab4,tab5 = st.tabs(["🏠 Start", "📊 Matchups", "📅 Wochenkategorien", "📋 Roster", "👨‍👨‍👧‍👦 Users"])
-st.image("Pictures/SL_logo.png", width=150)
 
 # --- Daten laden mit Caching ---
 @st.cache_data
@@ -19,6 +18,7 @@ def load_rosters():
     rosters = pd.read_parquet('league_stats/rosters/rosters.parquet', engine='pyarrow')
     rosters['starters'] = rosters['starters'].apply(lambda x: x.tolist() if isinstance(x, np.ndarray) else x)
     rosters[['QB', 'RB1', 'RB2', 'WR1', 'WR2', 'TE', 'FL', 'K', 'DEF']] = pd.DataFrame(rosters['starters'].to_list(), index=rosters.index)
+    # rosters[['record', 'streak']] = 
     return rosters
 def load_users():
     users = pd.read_parquet('league_stats/users.parquet', engine='pyarrow')
@@ -37,6 +37,7 @@ with tab1:
     st.title("Stoned Lack Redraft 2024 -- Wochenauswertung :football:")
     st.subheader("Wöchentlicher Überblick über die SLR 2024. 35 Ligen, 420 Manager, eine App.")
     st.write("Ankündigungen, Infos, Tipps auf dem Stoned Lack [Discord-Server](https://discord.gg/V9pt9MZ6Ch).")
+    st.image("Pictures/SL_logo.png", width=150)
 
 # --- Matchups ---
 with tab2:
@@ -101,7 +102,7 @@ with tab3:
     st.title("Wochenkategorien")
     
     if not matchups_df.empty:
-        select_week = st.selectbox("Woche auswählen", sorted(matchups_df['week'].unique(), reverse=True), index=0)
+        select_week = st.selectbox("Woche auswählen", sorted(matchups_df['week'].unique()), index=0)
         week_df = matchups_df[matchups_df['week'] == select_week]
         
         # Shootout der Woche
