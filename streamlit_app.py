@@ -13,11 +13,20 @@ tab1,tab2,tab3,tab4,tab5 = st.tabs(["🏠 Start", "📊 Matchups", "📅 Wochenk
 # --- Daten laden mit Caching ---
 @st.cache_data
 def load_matchups():
-    return pd.read_parquet('league_stats/matchups/matchups.parquet', engine='pyarrow')
+    matchups = pd.read_parquet('league_stats/matchups/matchups.parquet', engine='pyarrow')
+    matchups['starters'] = matchups['starters'].apply(lambda x: x.tolist() if isinstance(x, np.ndarray) else x)
+    matchups['players'] = matchups['players'].apply(lambda x: x.tolist() if isinstance(x, np.ndarray) else x)
+    # matchups['reserve'] = matchups['reserve'].apply(lambda x: x.tolist() if isinstance(x, np.ndarray) else x)
+    matchups['bench'] = matchups.apply(lambda row: [p for p in row['players'] if p not in row['starters']], axis=1)
+    matchups[['QB', 'RB1', 'RB2', 'WR1', 'WR2', 'TE', 'FL', 'K', 'DEF']] = pd.DataFrame(matchups['starters'].to_list(), index=matchups.index)
+    return matchups
 def load_rosters():
     rosters = pd.read_parquet('league_stats/rosters/rosters.parquet', engine='pyarrow')
-    rosters['starters'] = rosters['starters'].apply(lambda x: x.tolist() if isinstance(x, np.ndarray) else x)
-    rosters[['QB', 'RB1', 'RB2', 'WR1', 'WR2', 'TE', 'FL', 'K', 'DEF']] = pd.DataFrame(rosters['starters'].to_list(), index=rosters.index)
+    # rosters['starters'] = rosters['starters'].apply(lambda x: x.tolist() if isinstance(x, np.ndarray) else x)
+    # rosters['players'] = rosters['players'].apply(lambda x: x.tolist() if isinstance(x, np.ndarray) else x)
+    # rosters['reserve'] = rosters['reserve'].apply(lambda x: x.tolist() if isinstance(x, np.ndarray) else x)
+    # rosters['bench'] = rosters.apply(lambda row: [p for p in row['players'] if p not in row['starters']], axis=1)
+    # rosters[['QB', 'RB1', 'RB2', 'WR1', 'WR2', 'TE', 'FL', 'K', 'DEF']] = pd.DataFrame(rosters['starters'].to_list(), index=rosters.index)
     # metadata = rosters['metadata'].apply(pd.Series)
     settings = rosters['settings'].apply(pd.Series)
     # rosters = rosters.drop(columns=['metadata']).join(metadata)
@@ -25,7 +34,7 @@ def load_rosters():
     rosters['fpts'] = round(rosters['fpts'] + rosters['fpts_decimal'] / 100,2)
     rosters['fpts_against'] = round(rosters['fpts_against'] + rosters['fpts_against_decimal'] / 100,2)
     rosters['ppts'] = round(rosters['ppts'] + rosters['ppts_decimal'] / 100,2)
-    rosters = rosters.drop(columns=['fpts_decimal', 'fpts_against_decimal', 'ppts_decimal'])
+    rosters = rosters.drop(columns=['fpts_decimal', 'fpts_against_decimal', 'ppts_decimal', 'starters'])
     return rosters
 def load_users():
     users = pd.read_parquet('league_stats/users.parquet', engine='pyarrow')
@@ -100,7 +109,7 @@ with tab2:
         else:
             filtered_df = matchups_show[matchups_show[selected_column1] == selected_value1]
 
-    st.dataframe(filtered_df, hide_index=True)
+    st.dataframe(matchups_df, hide_index=True)
 
 
 # --- Wochenkategorien ---
