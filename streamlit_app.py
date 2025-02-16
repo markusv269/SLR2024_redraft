@@ -18,12 +18,18 @@ def load_rosters():
     rosters = pd.read_parquet('league_stats/rosters/rosters.parquet', engine='pyarrow')
     rosters['starters'] = rosters['starters'].apply(lambda x: x.tolist() if isinstance(x, np.ndarray) else x)
     rosters[['QB', 'RB1', 'RB2', 'WR1', 'WR2', 'TE', 'FL', 'K', 'DEF']] = pd.DataFrame(rosters['starters'].to_list(), index=rosters.index)
-    # rosters[['record', 'streak']] = 
+    # metadata = rosters['metadata'].apply(pd.Series)
+    settings = rosters['settings'].apply(pd.Series)
+    # rosters = rosters.drop(columns=['metadata']).join(metadata)
+    rosters = rosters.drop(columns=['settings']).join(settings)
+    rosters['fpts'] = round(rosters['fpts'] + rosters['fpts_decimal'] / 100,2)
+    rosters['fpts_against'] = round(rosters['fpts_against'] + rosters['fpts_against_decimal'] / 100,2)
+    rosters['ppts'] = round(rosters['ppts'] + rosters['ppts_decimal'] / 100,2)
+    rosters = rosters.drop(columns=['fpts_decimal', 'fpts_against_decimal', 'ppts_decimal'])
     return rosters
 def load_users():
     users = pd.read_parquet('league_stats/users.parquet', engine='pyarrow')
     return users
-
 
 matchups_df = load_matchups()
 rosters_df = load_rosters()
