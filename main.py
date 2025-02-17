@@ -16,7 +16,6 @@ def load_matchups():
     matchups = pd.read_parquet('league_stats/matchups/matchups.parquet', engine='pyarrow')
     matchups['starters'] = matchups['starters'].apply(lambda x: x.tolist() if isinstance(x, np.ndarray) else x)
     matchups['players'] = matchups['players'].apply(lambda x: x.tolist() if isinstance(x, np.ndarray) else x)
-    # matchups['reserve'] = matchups['reserve'].apply(lambda x: x.tolist() if isinstance(x, np.ndarray) else x)
     matchups['bench'] = matchups.apply(lambda row: [p for p in row['players'] if p not in row['starters']], axis=1)
     matchups[['QB', 'RB1', 'RB2', 'WR1', 'WR2', 'TE', 'FL', 'K', 'DEF']] = pd.DataFrame(matchups['starters'].to_list(), index=matchups.index)
     return matchups
@@ -49,10 +48,30 @@ def load_players():
     player_dict = players.set_index("player_id")["full_name"].to_dict()
     return players, player_dict
 
+def get_matchup_results(matchdf, userdf):
+    matchups = matchdf.groupby(["league_id", "week", "matchup_id"]).apply(
+        lambda x: pd.Series({
+            "winner_roster_id": x.loc[x["points"].idxmax(), "roster_id"],
+            "winner_points": x["points"].max(),
+            "loser_roster_id": x.loc[x["points"].idxmin(), "roster_id"],
+            "loser_points": x["points"].min()
+        })
+    ).reset_index()
+
+    # Merge für Gewinner-Namen
+    matchups = matchups.merge(userdf, left_on=["league_id", "winner_roster_id"], right_on=["league_id", "roster_id"], how="left")
+    matchups = matchups.rename(columns={"display_name": "winner_name"}).drop(columns=["roster_id", 'league_name', 'user_id', 'draft_pos'])
+
+    # Merge für Verlierer-Namen
+    matchups = matchups.merge(userdf, left_on=["league_id", "loser_roster_id"], right_on=["league_id", "roster_id"], how="left")
+    matchups = matchups.rename(columns={"display_name": "loser_name"}).drop(columns=["roster_id", 'user_id', 'draft_pos'])
+    return matchups
+
 matchups_df = load_matchups()
 rosters_df = load_rosters()
 users_df = load_users()
 players_df, players_dict = load_players()
+matches_df = get_matchup_results(matchdf=matchups_df, userdf=users_df)
 
 for pos in ['QB', 'RB1', 'RB2', 'WR1', 'WR2', 'TE', 'FL', 'K']:
     matchups_df[pos] = matchups_df[pos].map(players_dict)
@@ -97,8 +116,7 @@ with tab2:
     # st.pyplot(fig)
 
     # Annahme: matchups_show ist bereits definiert
-    columns = matchups_show.columns.tolist()#.remove('Starter Punkte', 'Starter')
-    columns.remove('players')
+    columns = ['League-ID', 'Woche']
 
     selected_column1 = st.selectbox("Filtern nach...", columns)
     if selected_column1:
@@ -168,4 +186,39 @@ with tab5:
     st.dataframe(filtered_df, hide_index=True)
 
 with tab6:
-    st.dataframe(players_df)
+    matches_show = matches_df[['league_name', 'week', 'winner_name', 'winner_points', 'loser_name', 'loser_points']]
+    matches_show = matches_show.rename(columns={
+        'league_name' : 'Liga',
+        'week' : 'Woche',
+        'winner_name' : 'Gewinner',
+        'winner_points' : 'Pkt. Gewinner',
+        'loser_name' : 'Verlierer',
+        'loser_points' : 'Pkt. Verlierer'        
+    })
+    # Filter-Auswahl direkt über der Tabelle
+    col1, col2 = st.columns(2)
+
+    with col1:
+        filter_type = st.selectbox('Filter:', ['Alle', 'Woche', 'Liga', 'Manager'], key="filter_type")
+
+    with col2:
+        if filter_type != "Alle":
+            filter_options = {
+                "Woche": sorted(matches_show['Woche'].unique()),
+                "Liga": sorted(matches_show['Liga'].unique()),
+                "Manager": sorted(set(matches_show['Gewinner']).union(set(matches_show['Verlierer'])))
+            }
+            filter_value = st.selectbox(f"{filter_type} auswählen", filter_options[filter_type], key="filter_value")
+        else:
+            filter_value = None
+
+    # Filter anwenden
+    if filter_type == "Woche":
+        matches_show = matches_show[matches_show['Woche'] == filter_value]
+    elif filter_type == "Liga":
+        matches_show = matches_show[matches_show['Liga'] == filter_value]
+    elif filter_type == "Manager":
+        matches_show = matches_show[(matches_show['Gewinner'] == filter_value) | (matches_show['Verlierer'] == filter_value)]
+
+    # Gefilterte Tabelle anzeigen
+    st.dataframe(matches_show, hide_index=True)
