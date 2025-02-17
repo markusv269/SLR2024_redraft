@@ -8,7 +8,7 @@ import numpy as np
 
 # --- Streamlit-Setup ---
 st.set_page_config(page_title="SLR 2024 Dashboard", layout="wide")
-tab1,tab2,tab3,tab4,tab5 = st.tabs(["🏠 Start", "📊 Matchups", "📅 Wochenkategorien", "📋 Roster", "👨‍👨‍👧‍👦 Users"])
+tab1,tab2,tab3,tab4,tab5,tab6 = st.tabs(["🏠 Start", "📊 Matchups", "📅 Wochenkategorien", "📋 Roster", "👨‍👨‍👧‍👦 Users", "NFL Player"])
 
 # --- Daten laden mit Caching ---
 @st.cache_data
@@ -20,6 +20,7 @@ def load_matchups():
     matchups['bench'] = matchups.apply(lambda row: [p for p in row['players'] if p not in row['starters']], axis=1)
     matchups[['QB', 'RB1', 'RB2', 'WR1', 'WR2', 'TE', 'FL', 'K', 'DEF']] = pd.DataFrame(matchups['starters'].to_list(), index=matchups.index)
     return matchups
+
 def load_rosters():
     rosters = pd.read_parquet('league_stats/rosters/rosters.parquet', engine='pyarrow')
     # rosters['starters'] = rosters['starters'].apply(lambda x: x.tolist() if isinstance(x, np.ndarray) else x)
@@ -36,16 +37,27 @@ def load_rosters():
     rosters['ppts'] = round(rosters['ppts'] + rosters['ppts_decimal'] / 100,2)
     rosters = rosters.drop(columns=['fpts_decimal', 'fpts_against_decimal', 'ppts_decimal', 'starters'])
     return rosters
+
 def load_users():
     users = pd.read_parquet('league_stats/users.parquet', engine='pyarrow')
     return users
 
+def load_players():
+    players = pd.read_json('sleeper_stats/players/players.json')
+    players = players.T.reset_index(drop=True)
+    players["full_name"] = players["full_name"].fillna(players["last_name"])
+    player_dict = players.set_index("player_id")["full_name"].to_dict()
+    return players, player_dict
+
 matchups_df = load_matchups()
 rosters_df = load_rosters()
 users_df = load_users()
+players_df, players_dict = load_players()
+
+for pos in ['QB', 'RB1', 'RB2', 'WR1', 'WR2', 'TE', 'FL', 'K']:
+    matchups_df[pos] = matchups_df[pos].map(players_dict)
 
 rosters_df = rosters_df.merge(users_df[['display_name', 'league_name', 'league_id', 'roster_id']], on=['league_id', 'roster_id'], how='left')
-
 
 # --- Startseite ---
 with tab1:
@@ -85,31 +97,21 @@ with tab2:
     # st.pyplot(fig)
 
     # Annahme: matchups_show ist bereits definiert
-    columns = matchups_show.columns.tolist()
+    columns = matchups_show.columns.tolist()#.remove('Starter Punkte', 'Starter')
     columns.remove('players')
 
     selected_column1 = st.selectbox("Filtern nach...", columns)
-
     if selected_column1:
         unique_values1 = matchups_show[selected_column1].dropna().unique()
         selected_value1 = st.selectbox("Wert festlegen...", unique_values1)
 
-        remaining_columns = [col for col in columns if col != selected_column1]
-        
-        if remaining_columns:
-            selected_column2 = st.selectbox("Weiterer Filter...", remaining_columns, index=0)
-            unique_values2 = matchups_show[selected_column2].dropna().unique()
-            selected_value2 = st.selectbox("Weiterer Wert festlegen...", unique_values2)
+    min_points, max_points = st.select_slider("Punkte eingrenzen",
+                                              options=list(range(0,225,5)),value=(0,220))
 
-            # Daten filtern
-            filtered_df = matchups_show[
-                (matchups_show[selected_column1] == selected_value1) & 
-                (matchups_show[selected_column2] == selected_value2)
-            ]
-        else:
-            filtered_df = matchups_show[matchups_show[selected_column1] == selected_value1]
+    filtered_df = matchups_show[(matchups_show[selected_column1] == selected_value1)]
+    filtered_df = filtered_df[(filtered_df['Punkte']>=min_points) & (filtered_df['Punkte']<=max_points)]
 
-    st.dataframe(matchups_df, hide_index=True)
+    st.dataframe(filtered_df, hide_index=True)
 
 
 # --- Wochenkategorien ---
@@ -164,3 +166,6 @@ with tab5:
 
     # Dataframe anzeigen
     st.dataframe(filtered_df, hide_index=True)
+
+with tab6:
+    st.dataframe(players_df)
