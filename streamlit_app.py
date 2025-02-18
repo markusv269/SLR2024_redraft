@@ -135,8 +135,8 @@ with tab2:
 with tab3:
     st.title("Wochenkategorien")
     if not matches_df.empty:
-        matches_df['pts_total'] = matches_df['winner_points'] + matches_df['loser_points']
-        matches_df['pts_diff'] = matches_df['winner_points'] - matches_df['loser_points']
+        matches_df['pts_total'] = round(matches_df['winner_points'] + matches_df['loser_points'],2)
+        matches_df['pts_diff'] = round(matches_df['winner_points'] - matches_df['loser_points'],2)
         select_week = st.selectbox("Woche auswählen", sorted(matches_df['week'].unique()), index=0)
         week_df = matches_df[matches_df['week'] == select_week]
         week_df = week_df[['league_name', 'winner_name', 'winner_points', 'loser_name', 'loser_points', 'pts_total', 'pts_diff']]
@@ -153,16 +153,16 @@ with tab3:
         # Shootout der Woche
         st.subheader('🔥 Shootout der Woche')
         # shootout_df = week_df.groupby(['league_id', 'matchup_id'])['points'].sum().reset_index()
-        st.dataframe(week_df.sort_values(by='Matchup Pkt.', ascending=False).head(1), hide_index=True)
+        st.dataframe(week_df.sort_values(by='Matchup Pkt.', ascending=False).head(1).style.set_properties(subset=['Matchup Pkt.'], **{'background-color': 'gray'}), hide_index=True)
         
         # Klatsche der Woche
         st.subheader('💀 Klatsche der Woche')
         # klatsche_df = week_df.groupby(['league_id', 'matchup_id'])['points'].agg(lambda x: x.max() - x.min()).reset_index()
-        st.dataframe(week_df.sort_values(by='Pkt. Diff.', ascending=False).head(1), hide_index=True)
+        st.dataframe(week_df.sort_values(by='Pkt. Diff.', ascending=False).head(1).style.set_properties(subset=['Pkt. Diff.'], **{'background-color': 'gray'}), hide_index=True)
         
         # Nailbiter der Woche
         st.subheader('😱 Nailbiter der Woche')
-        st.dataframe(week_df.sort_values(by='Pkt. Diff.', ascending=True).head(1), hide_index=True)
+        st.dataframe(week_df.sort_values(by='Pkt. Diff.', ascending=True).head(1).style.set_properties(subset=['Pkt. Diff.'], **{'background-color': 'gray'}), hide_index=True)
         
         # Top 5 Roster
         st.subheader('🏆 Top 5 Roster')
@@ -172,7 +172,7 @@ with tab3:
         top_roster_df = top_roster_df.rename(columns={
             'display_name':'Manager', 'points':'Punkte', 'league_name':'Liga'
         })
-        st.dataframe(top_roster_df, hide_index=True)
+        st.dataframe(top_roster_df.style.set_properties(subset=['Punkte'], **{'background-color': 'gray'}), hide_index=True)
     else:
         st.warning("Keine Daten für die ausgewählte Woche verfügbar.")
 
