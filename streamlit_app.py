@@ -8,7 +8,7 @@ import numpy as np
 
 # --- Streamlit-Setup ---
 st.set_page_config(page_title="SLR 2024 Dashboard", layout="wide")
-tab1,tab2,tab3,tab4,tab5,tab6 = st.tabs(["🏠 Start", "📊 Matchups", "📅 Wochenkategorien", "📋 Roster", "👨‍👨‍👧‍👦 Users", "NFL Player"])
+tab1,tab2,tab3,tab4,tab5,tab6 = st.tabs(["🏠 Start", "📊 Matchups", "📅 Wochenkategorien", "📋 Statistiken", "👨‍👨‍👧‍👦 Users", "NFL Player"])
 
 # --- Daten laden mit Caching ---
 @st.cache_data
@@ -85,8 +85,121 @@ with tab1:
     st.write("Ankündigungen, Infos, Tipps auf dem Stoned Lack [Discord-Server](https://discord.gg/V9pt9MZ6Ch).")
     st.image("Pictures/SL_logo.png", width=150)
 
-# --- Matchups ---
 with tab2:
+    st.title('Matchup-Übersicht')
+    st.write('Übersicht über alle Matchups. Filter nach Woche, Liga oder bestimmten Manager (zeigt alle gewonnenen und verlorernen Spiele).')
+    matches_show = matches_df[['league_name', 'week', 'winner_name', 'winner_points', 'loser_name', 'loser_points']]
+    matches_show = matches_show.rename(columns={
+        'league_name' : 'Liga',
+        'week' : 'Woche',
+        'winner_name' : 'Gewinner',
+        'winner_points' : 'Pkt. Gewinner',
+        'loser_name' : 'Verlierer',
+        'loser_points' : 'Pkt. Verlierer'        
+    })
+    matches_show['Pkt. Summe'] = matches_show['Pkt. Gewinner'] + matches_show['Pkt. Verlierer']
+    matches_show['Pkt. Diff'] = matches_show['Pkt. Gewinner'] - matches_show['Pkt. Verlierer']
+    # Filter-Auswahl direkt über der Tabelle
+    col1, col2 = st.columns(2)
+
+    with col1:
+        filter_type = st.selectbox('Filter:', ['Alle', 'Woche', 'Liga', 'Manager'], key="filter_type")
+
+    with col2:
+        if filter_type != "Alle":
+            filter_options = {
+                "Woche": sorted(matches_show['Woche'].unique()),
+                "Liga": sorted(matches_show['Liga'].unique()),
+                "Manager": sorted(set(matches_show['Gewinner']).union(set(matches_show['Verlierer'])))
+            }
+            filter_value = st.selectbox(f"{filter_type} auswählen", filter_options[filter_type], key="filter_value")
+        else:
+            filter_value = None
+
+    # Filter anwenden
+    if filter_type == "Woche":
+        matches_show = matches_show[matches_show['Woche'] == filter_value]
+    elif filter_type == "Liga":
+        matches_show = matches_show[matches_show['Liga'] == filter_value]
+    elif filter_type == "Manager":
+        matches_show = matches_show[(matches_show['Gewinner'] == filter_value) | (matches_show['Verlierer'] == filter_value)]
+
+    # Gefilterte Tabelle anzeigen
+    st.dataframe(matches_show, hide_index=True)
+
+# --- Wochenkategorien ---
+with tab3:
+    st.title("Wochenkategorien")
+    
+    if not matchups_df.empty:
+        select_week = st.selectbox("Woche auswählen", sorted(matchups_df['week'].unique()), index=0)
+        week_df = matchups_df[matchups_df['week'] == select_week]
+        
+        # Shootout der Woche
+        st.subheader('🔥 Shootout der Woche')
+        shootout_df = week_df.groupby(['league_id', 'matchup_id'])['points'].sum().reset_index()
+        st.dataframe(shootout_df.sort_values(by='points', ascending=False).head(1), hide_index=True)
+        
+        # Klatsche der Woche
+        st.subheader('💀 Klatsche der Woche')
+        klatsche_df = week_df.groupby(['league_id', 'matchup_id'])['points'].agg(lambda x: x.max() - x.min()).reset_index()
+        st.dataframe(klatsche_df.sort_values(by='points', ascending=False).head(1), hide_index=True)
+        
+        # Nailbiter der Woche
+        st.subheader('😱 Nailbiter der Woche')
+        st.dataframe(klatsche_df.sort_values(by='points', ascending=True).head(1), hide_index=True)
+        
+        # Top 5 Roster
+        st.subheader('🏆 Top 5 Roster')
+        top_roster_df = week_df[['points', 'league_id', 'starters']].sort_values(by='points', ascending=False).head(5)
+        st.dataframe(top_roster_df, hide_index=True)
+    else:
+        st.warning("Keine Daten für die ausgewählte Woche verfügbar.")
+
+with tab4:
+    st.title("Wöchentliche Statistiken")
+    weeklystats_show = rosters_df[['league_name', 'display_name', 'week', 'wins', 'losses', 'ties', 'fpts', 'fpts_against', 'ppts']]
+    weekly_league = st.selectbox('Wähle Liga:', weeklystats_show['league_name'].unique())
+    weekly_week = st.selectbox('Wähle Woche:', weeklystats_show['week'].unique())
+    weeklystats_show = weeklystats_show.rename(columns={
+        'league_name':'Liga',
+        'display_name':'Manager',
+        'week':'Woche',
+        'wins':'W',
+        'losses':'L',
+        'ties':'T',
+        'fpts':'FPTS for',
+        'fpts_against':'FPTS against',
+        'ppts':'Max PF'
+    })
+    if weekly_week != None and weekly_league != None:
+        filtered_weekly = weeklystats_show[(weeklystats_show['Woche']==weekly_week) & (weeklystats_show['Liga']==weekly_league)]
+    else:
+        filtered_weekly = weeklystats_show
+    filtered_weekly = filtered_weekly.sort_values(by=['W', 'FPTS for'], ascending=False).reset_index(drop=True)
+    st.dataframe(filtered_weekly, hide_index=True)
+
+with tab5:
+    st.title('SLR Manager')
+
+    # st.selectbox()
+    user_show = users_df[['league_name', 'display_name', 'roster_id', 'draft_pos']]
+    user_show = user_show.rename(columns={
+        'league_name': 'Liga',
+        'display_name': 'Manager',
+        'roster_id': 'Roster-ID',
+        'draft_pos': 'Draftposition'
+    })
+    selected_leagues = st.multiselect("Ligen auswählen:", user_show['Liga'].unique(), default=[])
+
+    # Falls keine Liga ausgewählt ist, zeige den gesamten DataFrame
+    filtered_df = user_show if not selected_leagues else user_show[user_show['Liga'].isin(selected_leagues)]
+
+    # Dataframe anzeigen
+    st.dataframe(filtered_df, hide_index=True)
+
+# --- Matchups ---
+with tab6:
     st.title("Wöchentliche Matchups")
 
     # matches = matchups_df.groupby(['league_id', 'week', 'matchup_id'])
@@ -130,95 +243,3 @@ with tab2:
     filtered_df = filtered_df[(filtered_df['Punkte']>=min_points) & (filtered_df['Punkte']<=max_points)]
 
     st.dataframe(filtered_df, hide_index=True)
-
-
-# --- Wochenkategorien ---
-with tab3:
-    st.title("Wochenkategorien")
-    
-    if not matchups_df.empty:
-        select_week = st.selectbox("Woche auswählen", sorted(matchups_df['week'].unique()), index=0)
-        week_df = matchups_df[matchups_df['week'] == select_week]
-        
-        # Shootout der Woche
-        st.subheader('🔥 Shootout der Woche')
-        shootout_df = week_df.groupby(['league_id', 'matchup_id'])['points'].sum().reset_index()
-        st.dataframe(shootout_df.sort_values(by='points', ascending=False).head(1), hide_index=True)
-        
-        # Klatsche der Woche
-        st.subheader('💀 Klatsche der Woche')
-        klatsche_df = week_df.groupby(['league_id', 'matchup_id'])['points'].agg(lambda x: x.max() - x.min()).reset_index()
-        st.dataframe(klatsche_df.sort_values(by='points', ascending=False).head(1), hide_index=True)
-        
-        # Nailbiter der Woche
-        st.subheader('😱 Nailbiter der Woche')
-        st.dataframe(klatsche_df.sort_values(by='points', ascending=True).head(1), hide_index=True)
-        
-        # Top 5 Roster
-        st.subheader('🏆 Top 5 Roster')
-        top_roster_df = week_df[['points', 'league_id', 'starters']].sort_values(by='points', ascending=False).head(5)
-        st.dataframe(top_roster_df, hide_index=True)
-    else:
-        st.warning("Keine Daten für die ausgewählte Woche verfügbar.")
-
-with tab4:
-    st.title("Roster")
-
-    st.dataframe(rosters_df, hide_index=True)
-
-with tab5:
-    st.title('SLR Manager')
-
-    # st.selectbox()
-    user_show = users_df[['league_name', 'display_name', 'roster_id', 'draft_pos']]
-    user_show = user_show.rename(columns={
-        'league_name': 'Liga',
-        'display_name': 'Manager',
-        'roster_id': 'Roster-ID',
-        'draft_pos': 'Draftposition'
-    })
-    selected_leagues = st.multiselect("Ligen auswählen:", user_show['Liga'].unique(), default=[])
-
-    # Falls keine Liga ausgewählt ist, zeige den gesamten DataFrame
-    filtered_df = user_show if not selected_leagues else user_show[user_show['Liga'].isin(selected_leagues)]
-
-    # Dataframe anzeigen
-    st.dataframe(filtered_df, hide_index=True)
-
-with tab6:
-    matches_show = matches_df[['league_name', 'week', 'winner_name', 'winner_points', 'loser_name', 'loser_points']]
-    matches_show = matches_show.rename(columns={
-        'league_name' : 'Liga',
-        'week' : 'Woche',
-        'winner_name' : 'Gewinner',
-        'winner_points' : 'Pkt. Gewinner',
-        'loser_name' : 'Verlierer',
-        'loser_points' : 'Pkt. Verlierer'        
-    })
-    # Filter-Auswahl direkt über der Tabelle
-    col1, col2 = st.columns(2)
-
-    with col1:
-        filter_type = st.selectbox('Filter:', ['Alle', 'Woche', 'Liga', 'Manager'], key="filter_type")
-
-    with col2:
-        if filter_type != "Alle":
-            filter_options = {
-                "Woche": sorted(matches_show['Woche'].unique()),
-                "Liga": sorted(matches_show['Liga'].unique()),
-                "Manager": sorted(set(matches_show['Gewinner']).union(set(matches_show['Verlierer'])))
-            }
-            filter_value = st.selectbox(f"{filter_type} auswählen", filter_options[filter_type], key="filter_value")
-        else:
-            filter_value = None
-
-    # Filter anwenden
-    if filter_type == "Woche":
-        matches_show = matches_show[matches_show['Woche'] == filter_value]
-    elif filter_type == "Liga":
-        matches_show = matches_show[matches_show['Liga'] == filter_value]
-    elif filter_type == "Manager":
-        matches_show = matches_show[(matches_show['Gewinner'] == filter_value) | (matches_show['Verlierer'] == filter_value)]
-
-    # Gefilterte Tabelle anzeigen
-    st.dataframe(matches_show, hide_index=True)
