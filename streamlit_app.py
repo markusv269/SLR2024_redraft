@@ -169,6 +169,9 @@ with tab3:
         top_roster_df = matchups_df[matchups_df['week']==select_week]
         top_roster_df = top_roster_df.merge(users_df[['league_id', 'roster_id', 'display_name', 'league_name']], on=['league_id', 'roster_id'], how='left')
         top_roster_df = top_roster_df[['display_name', 'points', 'league_name', 'QB', 'RB1','RB2','WR1', 'WR2', 'TE', 'FL', 'K', 'DEF']].sort_values(by='points', ascending=False).head(5)
+        top_roster_df = top_roster_df.rename(columns={
+            'display_name':'Manager', 'points':'Punkte', 'league_name':'Liga'
+        })
         st.dataframe(top_roster_df, hide_index=True)
     else:
         st.warning("Keine Daten für die ausgewählte Woche verfügbar.")
