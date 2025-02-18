@@ -262,4 +262,3 @@ with tab6:
     # filtered_df = filtered_df[(filtered_df['Punkte']>=min_points) & (filtered_df['Punkte']<=max_points)]
 
     # st.dataframe(filtered_df, hide_index=True)
-print(matchups_df.columns)
