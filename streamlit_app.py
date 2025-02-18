@@ -20,6 +20,7 @@ def load_matchups():
     matchups[['QB', 'RB1', 'RB2', 'WR1', 'WR2', 'TE', 'FL', 'K', 'DEF']] = pd.DataFrame(matchups['starters'].to_list(), index=matchups.index)
     return matchups
 
+@st.cache_data
 def load_rosters():
     rosters = pd.read_parquet('league_stats/rosters/rosters.parquet', engine='pyarrow')
     # rosters['starters'] = rosters['starters'].apply(lambda x: x.tolist() if isinstance(x, np.ndarray) else x)
@@ -37,10 +38,12 @@ def load_rosters():
     rosters = rosters.drop(columns=['fpts_decimal', 'fpts_against_decimal', 'ppts_decimal', 'starters'])
     return rosters
 
+@st.cache_data
 def load_users():
     users = pd.read_parquet('league_stats/users.parquet', engine='pyarrow')
     return users
 
+@st.cache_data
 def load_players():
     players = pd.read_json('sleeper_stats/players/players.json')
     players = players.T.reset_index(drop=True)
@@ -48,6 +51,7 @@ def load_players():
     player_dict = players.set_index("player_id")["full_name"].to_dict()
     return players, player_dict
 
+@st.cache_data
 def get_matchup_results(matchdf, userdf):
     matchups = matchdf.groupby(["league_id", "week", "matchup_id"]).apply(
         lambda x: pd.Series({
@@ -130,28 +134,41 @@ with tab2:
 # --- Wochenkategorien ---
 with tab3:
     st.title("Wochenkategorien")
-    
-    if not matchups_df.empty:
-        select_week = st.selectbox("Woche auswählen", sorted(matchups_df['week'].unique()), index=0)
-        week_df = matchups_df[matchups_df['week'] == select_week]
-        
+    if not matches_df.empty:
+        matches_df['pts_total'] = matches_df['winner_points'] + matches_df['loser_points']
+        matches_df['pts_diff'] = matches_df['winner_points'] - matches_df['loser_points']
+        select_week = st.selectbox("Woche auswählen", sorted(matches_df['week'].unique()), index=0)
+        week_df = matches_df[matches_df['week'] == select_week]
+        week_df = week_df[['league_name', 'winner_name', 'winner_points', 'loser_name', 'loser_points', 'pts_total', 'pts_diff']]
+        week_df = week_df.rename(columns={
+            'league_name':'Liga',
+            'winner_name':'Gewinner',
+            'winner_points':'Gewinner Pkt.',
+            'loser_name':'Verlierer',
+            'loser_points':'Verlierer Pkt.',
+            'pts_total':'Matchup Pkt.',
+            'pts_diff':'Pkt. Diff.'
+        })
+
         # Shootout der Woche
         st.subheader('🔥 Shootout der Woche')
-        shootout_df = week_df.groupby(['league_id', 'matchup_id'])['points'].sum().reset_index()
-        st.dataframe(shootout_df.sort_values(by='points', ascending=False).head(1), hide_index=True)
+        # shootout_df = week_df.groupby(['league_id', 'matchup_id'])['points'].sum().reset_index()
+        st.dataframe(week_df.sort_values(by='Matchup Pkt.', ascending=False).head(1), hide_index=True)
         
         # Klatsche der Woche
         st.subheader('💀 Klatsche der Woche')
-        klatsche_df = week_df.groupby(['league_id', 'matchup_id'])['points'].agg(lambda x: x.max() - x.min()).reset_index()
-        st.dataframe(klatsche_df.sort_values(by='points', ascending=False).head(1), hide_index=True)
+        # klatsche_df = week_df.groupby(['league_id', 'matchup_id'])['points'].agg(lambda x: x.max() - x.min()).reset_index()
+        st.dataframe(week_df.sort_values(by='Pkt. Diff.', ascending=False).head(1), hide_index=True)
         
         # Nailbiter der Woche
         st.subheader('😱 Nailbiter der Woche')
-        st.dataframe(klatsche_df.sort_values(by='points', ascending=True).head(1), hide_index=True)
+        st.dataframe(week_df.sort_values(by='Pkt. Diff.', ascending=True).head(1), hide_index=True)
         
         # Top 5 Roster
         st.subheader('🏆 Top 5 Roster')
-        top_roster_df = week_df[['points', 'league_id', 'starters']].sort_values(by='points', ascending=False).head(5)
+        top_roster_df = matchups_df[matchups_df['week']==select_week]
+        top_roster_df = top_roster_df.merge(users_df[['league_id', 'roster_id', 'display_name', 'league_name']], on=['league_id', 'roster_id'], how='left')
+        top_roster_df = top_roster_df[['display_name', 'points', 'league_name', 'QB', 'RB1','RB2','WR1', 'WR2', 'TE', 'FL', 'K', 'DEF']].sort_values(by='points', ascending=False).head(5)
         st.dataframe(top_roster_df, hide_index=True)
     else:
         st.warning("Keine Daten für die ausgewählte Woche verfügbar.")
@@ -159,6 +176,7 @@ with tab3:
 with tab4:
     st.title("Wöchentliche Statistiken")
     weeklystats_show = rosters_df[['league_name', 'display_name', 'week', 'wins', 'losses', 'ties', 'fpts', 'fpts_against', 'ppts']]
+    weeklystats_show['St/Sit-Acc. [%]'] = round(weeklystats_show['fpts'] / weeklystats_show['ppts'] * 100,2)
     weekly_league = st.selectbox('Wähle Liga:', weeklystats_show['league_name'].unique())
     weekly_week = st.selectbox('Wähle Woche:', weeklystats_show['week'].unique())
     weeklystats_show = weeklystats_show.rename(columns={
@@ -200,46 +218,48 @@ with tab5:
 
 # --- Matchups ---
 with tab6:
-    st.title("Wöchentliche Matchups")
+    st.write('Hier gibt es noch nichts zu sehen. Stay tuned!')
+    # st.title("Wöchentliche Matchups")
 
-    # matches = matchups_df.groupby(['league_id', 'week', 'matchup_id'])
+    # # matches = matchups_df.groupby(['league_id', 'week', 'matchup_id'])
     
-    # Unnötige Spalten entfernen und Spaltennamen umbenennen
-    matchups_show = matchups_df[~matchups_df['matchup_id'].isin([0, None])]
-    matchups_show = matchups_show.drop(columns=['custom_points', 'players_points'])
-    matchups_show = matchups_show.rename(columns={
-        'points': 'Punkte',
-        'roster_id': 'Roster-ID',
-        'matchup_id': 'Matchup-ID',
-        'starters': 'Starter',
-        'starters_points': 'Starter Punkte',
-        'week': 'Woche',
-        'league_id': 'League-ID'
-    })
+    # # Unnötige Spalten entfernen und Spaltennamen umbenennen
+    # matchups_show = matchups_df[~matchups_df['matchup_id'].isin([0, None])]
+    # matchups_show = matchups_show.drop(columns=['custom_points', 'players_points'])
+    # matchups_show = matchups_show.rename(columns={
+    #     'points': 'Punkte',
+    #     'roster_id': 'Roster-ID',
+    #     'matchup_id': 'Matchup-ID',
+    #     'starters': 'Starter',
+    #     'starters_points': 'Starter Punkte',
+    #     'week': 'Woche',
+    #     'league_id': 'League-ID'
+    # })
 
-    # # Barplot für min, max und durchschnittliche Punkte pro Woche
-    # st.subheader("📊 Punkteverteilung pro Woche")
-    # stats_df = matchups_df[~matchups_df['matchup_id'].isin([0, None])].groupby("week")["points"].agg(["min", "mean", "max"]).reset_index()
+    # # # Barplot für min, max und durchschnittliche Punkte pro Woche
+    # # st.subheader("📊 Punkteverteilung pro Woche")
+    # # stats_df = matchups_df[~matchups_df['matchup_id'].isin([0, None])].groupby("week")["points"].agg(["min", "mean", "max"]).reset_index()
     
-    # fig, ax = plt.subplots(figsize=(10, 3))
-    # sns.barplot(data=stats_df.melt(id_vars="week", var_name="Stat", value_name="Wert"), x="week", y="Wert", hue="Stat", ax=ax)
-    # # ax.set_title("Minimal, Maximal und Durchschnittlich erzielte Punkte pro Woche")
-    # ax.set_xlabel("Woche")
-    # ax.set_ylabel("Punkte")
-    # st.pyplot(fig)
+    # # fig, ax = plt.subplots(figsize=(10, 3))
+    # # sns.barplot(data=stats_df.melt(id_vars="week", var_name="Stat", value_name="Wert"), x="week", y="Wert", hue="Stat", ax=ax)
+    # # # ax.set_title("Minimal, Maximal und Durchschnittlich erzielte Punkte pro Woche")
+    # # ax.set_xlabel("Woche")
+    # # ax.set_ylabel("Punkte")
+    # # st.pyplot(fig)
 
-    # Annahme: matchups_show ist bereits definiert
-    columns = ['League-ID', 'Woche']
+    # # Annahme: matchups_show ist bereits definiert
+    # columns = ['League-ID', 'Woche']
 
-    selected_column1 = st.selectbox("Filtern nach...", columns)
-    if selected_column1:
-        unique_values1 = matchups_show[selected_column1].dropna().unique()
-        selected_value1 = st.selectbox("Wert festlegen...", unique_values1)
+    # selected_column1 = st.selectbox("Filtern nach...", columns)
+    # if selected_column1:
+    #     unique_values1 = matchups_show[selected_column1].dropna().unique()
+    #     selected_value1 = st.selectbox("Wert festlegen...", unique_values1)
 
-    min_points, max_points = st.select_slider("Punkte eingrenzen",
-                                              options=list(range(0,225,5)),value=(0,220))
+    # min_points, max_points = st.select_slider("Punkte eingrenzen",
+    #                                           options=list(range(0,225,5)),value=(0,220))
 
-    filtered_df = matchups_show[(matchups_show[selected_column1] == selected_value1)]
-    filtered_df = filtered_df[(filtered_df['Punkte']>=min_points) & (filtered_df['Punkte']<=max_points)]
+    # filtered_df = matchups_show[(matchups_show[selected_column1] == selected_value1)]
+    # filtered_df = filtered_df[(filtered_df['Punkte']>=min_points) & (filtered_df['Punkte']<=max_points)]
 
-    st.dataframe(filtered_df, hide_index=True)
+    # st.dataframe(filtered_df, hide_index=True)
+print(matchups_df.columns)
