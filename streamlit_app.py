@@ -8,7 +8,7 @@ import numpy as np
 
 # --- Streamlit-Setup ---
 st.set_page_config(page_title="SLR 2024 Dashboard", layout="wide")
-tab1,tab2,tab3,tab4,tab5,tab6 = st.tabs(["🏠 Start", "📊 Matchups", "📅 Wochenkategorien", "📋 Statistiken", "👨‍👨‍👧‍👦 Users", "NFL Player"])
+tab1,tab2,tab3,tab4,tab5,tab6,tab7 = st.tabs(["🏠 Start", "📊 Matchups", "📅 Wochenkategorien", "📋 Statistiken", "👨‍👨‍👧‍👦 Users", "NFL Player", "SLR Ligen"])
 
 # --- Daten laden mit Caching ---
 @st.cache_data
@@ -200,11 +200,13 @@ with tab4:
     filtered_weekly = filtered_weekly.sort_values(by=['W', 'FPTS for'], ascending=False).reset_index(drop=True)
     st.dataframe(filtered_weekly, hide_index=True)
 
+# --- User ---
 with tab5:
     st.title('SLR Manager')
 
     # st.selectbox()
-    user_show = users_df[['league_name', 'display_name', 'roster_id', 'draft_pos']]
+    user_show = users_df[['league_name', 'display_name', 'roster_id', 'draft_pos', 'league_id']]
+    user_show['URL'] = user_show.apply(lambda x: f'<a href="https://sleeper.com/roster/{x["league_id"]}/{x["roster_id"]}" target="_blank">Roster Link</a>', axis=1)
     user_show = user_show.rename(columns={
         'league_name': 'Liga',
         'display_name': 'Manager',
@@ -215,9 +217,12 @@ with tab5:
 
     # Falls keine Liga ausgewählt ist, zeige den gesamten DataFrame
     filtered_df = user_show if not selected_leagues else user_show[user_show['Liga'].isin(selected_leagues)]
+    filtered_df = filtered_df.drop(columns=['league_id'])
 
     # Dataframe anzeigen
-    st.dataframe(filtered_df, hide_index=True)
+    # st.dataframe(filtered_df, hide_index=True)
+
+    st.markdown(filtered_df.to_html(escape=False, index=False), unsafe_allow_html=True)
 
 # --- Matchups ---
 with tab6:
@@ -265,3 +270,13 @@ with tab6:
     # filtered_df = filtered_df[(filtered_df['Punkte']>=min_points) & (filtered_df['Punkte']<=max_points)]
 
     # st.dataframe(filtered_df, hide_index=True)
+
+with tab7:
+    st.title("Die Stoned Lack Redraft Ligen 2024")
+    st.header("Settings")
+    st.subheader("Roster uns sonstige Einstellungen")
+    st.write("Die SLR Ligen werden mit 12 Managern gespielt. Jedes Team besteht aus 15 Spielern. Das Starting Lineup besteht aus")
+    st.write("1 QB, 2 RB, 2 WR, 1 TE, 1 Flex, 1 K, 1 DST.")
+    st.write("Jeder Manager erhält zu Beginn der Saison 100 $ FAAB (Waiver Budget).")
+    st.subheader("Scoring")
+    st.write("Das Scoring entspricht dem PPR-Scoring (1 Punkt je Reception) mit den üblichen Einstellungen. Die gesamten Scoring-Settings können nachfolgender Tabelle entnommen werden")
