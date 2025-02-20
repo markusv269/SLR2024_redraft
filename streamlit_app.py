@@ -5,6 +5,7 @@ import streamlit as st
 import graphviz
 import json
 import requests
+import os
 
 # --- Streamlit-Setup ---
 st.set_page_config(page_title="SLR 2024 Dashboard", layout="wide")
@@ -64,6 +65,56 @@ def get_matchup_results(matchdf, userdf):
     matchups = matchups.rename(columns={"display_name": "loser_name"}).drop(columns=["roster_id", 'user_id', 'draft_pos'])
     return matchups
 
+@st.cache_data
+def load_scoring_settings():
+    scoring_settings = {
+        "sack": 1,
+        "fgm_40_49": 4,
+        "pass_int": -1,
+        "pts_allow_0": 10,
+        "pass_2pt": 2,
+        "st_td": 6,
+        "rec_td": 6,
+        "fgm_30_39": 3,
+        "xpmiss": -1,
+        "rush_td": 6,
+        "rec_2pt": 2,
+        "st_fum_rec": 1,
+        "fgmiss": -1,
+        "ff": 1,
+        "rec": 1,
+        "pts_allow_14_20": 1,
+        "fgm_0_19": 3,
+        "int": 2,
+        "def_st_fum_rec": 1,
+        "fum_lost": -2,
+        "pts_allow_1_6": 7,
+        "kr_yd": 0,
+        "fgm_20_29": 3,
+        "pts_allow_21_27": 0,
+        "xpm": 1,
+        "rush_2pt": 2,
+        "fum_rec": 2,
+        "def_st_td": 6,
+        "fgm_50p": 5,
+        "def_td": 6,
+        "safe": 2,
+        "pass_yd": 0.04,
+        "blk_kick": 2,
+        "pass_td": 4,
+        "rush_yd": 0.1,
+        "pr_yd": 0,
+        "fum": -1,
+        "pts_allow_28_34": -1,
+        "pts_allow_35p": -4,
+        "fum_rec_td": 6,
+        "rec_yd": 0.1,
+        "def_st_ff": 1,
+        "pts_allow_7_13": 4,
+        "st_ff": 1
+    }
+    return scoring_settings
+
 users_df = load_users()
 matchups_df = load_matchups()
 matchups_df = matchups_df.merge(users_df[['league_id', 'roster_id', 'display_name', 'league_name']], on=['league_id', 'roster_id'], how='left')
@@ -76,7 +127,7 @@ for pos in ['QB', 'RB1', 'RB2', 'WR1', 'WR2', 'TE', 'FL', 'K']:
     matchups_df[pos] = matchups_df[pos].map(players_dict)
 
 rosters_df = rosters_df.merge(users_df[['display_name', 'league_name', 'league_id', 'roster_id']], on=['league_id', 'roster_id'], how='left')
-
+scoring_settings = load_scoring_settings()
 # --- Startseite ---
 with tab1:
     st.title("Stoned Lack Redraft 2024 -- Wochenauswertung :football:")
@@ -307,56 +358,176 @@ with tab5:
 # --- NFL Player ---
 with tab6:
     st.write('Hier gibt es noch nichts zu sehen. Stay tuned!')
-    # st.title("Wöchentliche Matchups")
 
-    # # matches = matchups_df.groupby(['league_id', 'week', 'matchup_id'])
-    
-    # # Unnötige Spalten entfernen und Spaltennamen umbenennen
-    # matchups_show = matchups_df[~matchups_df['matchup_id'].isin([0, None])]
-    # matchups_show = matchups_show.drop(columns=['custom_points', 'players_points'])
-    # matchups_show = matchups_show.rename(columns={
-    #     'points': 'Punkte',
-    #     'roster_id': 'Roster-ID',
-    #     'matchup_id': 'Matchup-ID',
-    #     'starters': 'Starter',
-    #     'starters_points': 'Starter Punkte',
-    #     'week': 'Woche',
-    #     'league_id': 'League-ID'
-    # })
+    def calculate_fantasy_points(stats, scoring_settings):
+        """Berechnet Fantasy-Punkte basierend auf stats und scoring_settings."""
+        return sum(stats.get(stat, 0) * scoring_settings.get(stat, 0) for stat in scoring_settings.keys())
 
-    # # # Barplot für min, max und durchschnittliche Punkte pro Woche
-    # # st.subheader("📊 Punkteverteilung pro Woche")
-    # # stats_df = matchups_df[~matchups_df['matchup_id'].isin([0, None])].groupby("week")["points"].agg(["min", "mean", "max"]).reset_index()
-    
-    # # fig, ax = plt.subplots(figsize=(10, 3))
-    # # sns.barplot(data=stats_df.melt(id_vars="week", var_name="Stat", value_name="Wert"), x="week", y="Wert", hue="Stat", ax=ax)
-    # # # ax.set_title("Minimal, Maximal und Durchschnittlich erzielte Punkte pro Woche")
-    # # ax.set_xlabel("Woche")
-    # # ax.set_ylabel("Punkte")
-    # # st.pyplot(fig)
+    def load_player_data(json_file, scoring_settings, is_projection=True):
+        """Lädt relevante Spielerstatistiken aus einer JSON-Datei (Projections oder Stats)."""
+        if not os.path.exists(json_file):
+            # print(f"❌ Datei nicht gefunden: {json_file}")
+            return {}
 
-    # # Annahme: matchups_show ist bereits definiert
-    # columns = ['League-ID', 'Woche']
+        with open(json_file, 'r') as f:
+            data = json.load(f)
 
-    # selected_column1 = st.selectbox("Filtern nach...", columns)
-    # if selected_column1:
-    #     unique_values1 = matchups_show[selected_column1].dropna().unique()
-    #     selected_value1 = st.selectbox("Wert festlegen...", unique_values1)
+        player_data = {}
 
-    # min_points, max_points = st.select_slider("Punkte eingrenzen",
-    #                                           options=list(range(0,225,5)),value=(0,220))
+        if is_projection:
+            # Projections sind Listen mit Dictionaries
+            if isinstance(data, list):
+                for entry in data:
+                    player_id = entry.get("player_id")
+                    stats = entry.get("stats", {})
 
-    # filtered_df = matchups_show[(matchups_show[selected_column1] == selected_value1)]
-    # filtered_df = filtered_df[(filtered_df['Punkte']>=min_points) & (filtered_df['Punkte']<=max_points)]
+                    # Nur relevante Stats extrahieren
+                    filtered_stats = {stat: value for stat, value in stats.items() if stat in scoring_settings}
 
-    # st.dataframe(filtered_df, hide_index=True)
+                    if player_id and filtered_stats:
+                        player_data[player_id] = filtered_stats
+            else:
+                None
+                # print(f"⚠ Unerwartetes JSON-Format in {json_file} für Projections")
+
+        else:
+            # Stats sind Dictionaries mit player_id als Schlüssel
+            if isinstance(data, dict):
+                for player_id, stats in data.items():
+                    filtered_stats = {stat: value for stat, value in stats.items() if stat in scoring_settings}
+
+                    if filtered_stats:
+                        player_data[player_id] = filtered_stats
+            else:
+                None
+                # print(f"⚠ Unerwartetes JSON-Format in {json_file} für Stats")
+
+        # print(f"✅ Geladene Spieler aus {json_file}: {len(player_data)} Spieler")
+        return player_data
+
+    def create_combined_df(weeks, scoring_settings):
+        """Erstellt ein DataFrame mit 'player_id' sowie proj_{week} und stats_{week}-Spalten."""
+        all_data = {}
+
+        for week in weeks:
+            proj_file = f"sleeper_stats/projections/projection_{week}.json"
+            stats_file = f"sleeper_stats/stats/stats_{week}.json"
+
+            # Projections laden
+            proj_stats = load_player_data(proj_file, scoring_settings, is_projection=True)
+            for player_id, stats in proj_stats.items():
+                if player_id not in all_data:
+                    all_data[player_id] = {}
+                all_data[player_id][f'proj_{week}'] = calculate_fantasy_points(stats, scoring_settings)
+
+            # Tatsächliche Stats laden
+            actual_stats = load_player_data(stats_file, scoring_settings, is_projection=False)
+            for player_id, stats in actual_stats.items():
+                if player_id not in all_data:
+                    all_data[player_id] = {}
+                all_data[player_id][f'stats_{week}'] = calculate_fantasy_points(stats, scoring_settings)
+
+        # DataFrame erstellen
+        df = pd.DataFrame.from_dict(all_data, orient='index').reset_index()
+        df.rename(columns={'index': 'player_id'}, inplace=True)
+        df = df.fillna(0)
+
+        return df
+
+    # Beispiel: Wochen 1-5
+    weeks = range(1, 19)
+
+    df_combined = create_combined_df(weeks, scoring_settings)
+
+    players_df = players_df.merge(df_combined, on='player_id', how='right')
+
+    # Ausgabe in Streamlit
+    players_show = players_df[['full_name', 'team', 'position'] + [f"stats_{week}" for week in weeks] + [f"proj_{week}" for week in weeks]]
+    players_show['fpts_total'] = players_show[[f"stats_{week}" for week in weeks]].sum(axis=1)
+    players_show['proj_total'] = players_show[[f"proj_{week}" for week in weeks]].sum(axis=1)
+
+    players_show = players_show.dropna(subset=['full_name'], axis=0)
+    st.dataframe(players_show)
 
 with tab7:
     st.title("Die Stoned Lack Redraft Ligen 2024")
     st.header("Settings")
-    st.subheader("Roster uns sonstige Einstellungen")
+    # st.subheader("Roster uns sonstige Einstellungen")
     st.write("Die SLR Ligen werden mit 12 Managern gespielt. Jedes Team besteht aus 15 Spielern. Das Starting Lineup besteht aus")
     st.write("1 QB, 2 RB, 2 WR, 1 TE, 1 Flex, 1 K, 1 DST.")
     st.write("Jeder Manager erhält zu Beginn der Saison 100 $ FAAB (Waiver Budget).")
-    st.subheader("Scoring")
-    st.write("Das Scoring entspricht dem PPR-Scoring (1 Punkt je Reception) mit den üblichen Einstellungen. Die gesamten Scoring-Settings können nachfolgender Tabelle entnommen werden")
+    st.header("Scoring")
+    st.write("Das Scoring entspricht dem PPR-Scoring (1 Punkt je Reception) mit den üblichen Einstellungen. Die gesamten Scoring-Settings können den nachfolgenden Tabellen entnommen werden")
+
+    # Kategorien definieren
+    categories = {
+        "Passing": ["pass_yd", "pass_td", "pass_2pt", "pass_int"],
+        "Rushing": ["rush_yd", "rush_td", "rush_2pt"],
+        "Receiving": ["rec_yd", "rec_td", "rec_2pt", "rec"],
+        "Special Teams": ["st_td", "st_fum_rec", "st_ff", "kr_yd", "pr_yd"],
+        "Defense": ["sack", "int", "ff", "fum_rec", "fum_rec_td", "def_td", "safe", "blk_kick", "def_st_ff", "def_st_fum_rec", "def_st_td"],
+        "Kicking": ["fgm_0_19", "fgm_20_29", "fgm_30_39", "fgm_40_49", "fgm_50p", "fgmiss", "xpm", "xpmiss"],
+    }
+
+    # Beschreibungen der Stats
+    descriptions = {
+        "pass_yd": "Passing Yards (pro Yard)",
+        "pass_td": "Passing Touchdown",
+        "pass_2pt": "2-Punkt-Conversion (Pass)",
+        "pass_int": "Interception geworfen",
+        "rush_yd": "Rushing Yards (pro Yard)",
+        "rush_td": "Rushing Touchdown",
+        "rush_2pt": "2-Punkt-Conversion (Rush)",
+        "rec_yd": "Receiving Yards (pro Yard)",
+        "rec_td": "Receiving Touchdown",
+        "rec_2pt": "2-Punkt-Conversion (Receiving)",
+        "rec": "Reception (gefangener Pass)",
+        "st_td": "Special Teams Touchdown",
+        "st_fum_rec": "Special Teams Fumble Recovery",
+        "st_ff": "Special Teams Forced Fumble",
+        "sack": "Quarterback Sack",
+        "int": "Interception gefangen",
+        "ff": "Forced Fumble",
+        "fum_rec": "Fumble Recovery",
+        "fum_rec_td": "Fumble Recovery Touchdown",
+        "def_td": "Defensive Touchdown",
+        "safe": "Safety",
+        "blk_kick": "Blocked Kick",
+        "def_st_ff": "Defense/Special Teams Forced Fumble",
+        "def_st_fum_rec": "Defense/Special Teams Fumble Recovery",
+        "def_st_td": "Defense/Special Teams Touchdown",
+        "fgm_0_19": "Field Goal (0-19 Yards) verwandelt",
+        "fgm_20_29": "Field Goal (20-29 Yards) verwandelt",
+        "fgm_30_39": "Field Goal (30-39 Yards) verwandelt",
+        "fgm_40_49": "Field Goal (40-49 Yards) verwandelt",
+        "fgm_50p": "Field Goal (50+ Yards) verwandelt",
+        "fgmiss": "Field Goal verschossen",
+        "xpm": "Extra Punkt verwandelt",
+        "xpmiss": "Extra Punkt verschossen",
+        "pts_allow_0": "Gegnerische Punkte: 0",
+        "pts_allow_1_6": "Gegnerische Punkte: 1-6",
+        "pts_allow_7_13": "Gegnerische Punkte: 7-13",
+        "pts_allow_14_20": "Gegnerische Punkte: 14-20",
+        "pts_allow_21_27": "Gegnerische Punkte: 21-27",
+        "pts_allow_28_34": "Gegnerische Punkte: 28-34",
+        "pts_allow_35p": "Gegnerische Punkte: 35+",
+    }
+
+    # Daten für die Tabelle sammeln
+    for category, keys in categories.items():
+        data = []
+        for key in keys:
+            if key in scoring_settings:
+                data.append({
+                    # "Kategorie": category,
+                    "Sleeper-Stat": key,
+                    "Beschreibung": descriptions.get(key, "Keine Beschreibung verfügbar"),
+                    "Punkte": scoring_settings[key]
+                })
+    
+        if data:
+            df = pd.DataFrame(data)
+            st.subheader(category)
+            st.dataframe(df.set_index("Sleeper-Stat"), hide_index=True)
+
+    # st.json(scoring_settings)
