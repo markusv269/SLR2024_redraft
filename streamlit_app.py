@@ -245,7 +245,6 @@ with tab4:
                     dot.edge(f"M{prev_match['w']}", f"M{match_id}", color="black", penwidth="2")
                 elif "l" in prev_match:
                     dot.edge(f"M{prev_match['l']}", f"M{match_id}", style="dashed", color="gray")
-
         return dot
 
     # Bestimme die league_id anhand der ausgewählten Liga
