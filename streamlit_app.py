@@ -209,39 +209,43 @@ with tab4:
 
     def build_bracket_graph(data, league_id, matchups_df):
         dot = graphviz.Digraph(format='png')
-        dot.attr('node', shape='rectangle')
-        
+        dot.attr(rankdir='LR', nodesep='0.9', ranksep='1.2')  # Erhöht Abstände zwischen Nodes
+
         for match in data:
             match_id = match["m"]
             round_num = match["r"]
             place = match.get("p")
-            
+
             team1_id = match["t1"]
             team2_id = match["t2"]
 
             team1_name, team1_points = get_team_info(league_id, team1_id, round_num, matchups_df)
             team2_name, team2_points = get_team_info(league_id, team2_id, round_num, matchups_df)
 
-            label = f"Week {14+round_num}\n{team1_name} ({team1_points}) \n {team2_name} ({team2_points})"
+            # HTML-Label mit fettem Teamnamen und normalem Punktestand
+            label = f"""<<B>Week {14+round_num}</B><BR/><BR/><B>{team1_name}</B> ({team1_points})<BR/><B>{team2_name}</B> ({team2_points})>"""
+
             if place is not None:
-                label = f"Week {14+round_num}, Spiel um Pl. {place}\n{team1_name} ({team1_points}) \n {team2_name} ({team2_points})"
-            
-            dot.node(f"M{match_id}", label=label)
-            
+                label = f"""<<B>Week {14+round_num} (Spiel um Platz {place})</B><BR/><BR/><B>{team1_name}</B> ({team1_points})<BR/><B>{team2_name}</B> ({team2_points})>"""
+
+            # Füge Knoten mit Stil hinzu
+            dot.node(f"M{match_id}", label=label, shape="box", style="filled", fillcolor="#f8f9fa", fontsize="12")
+
+            # Verbindungslinien für vorherige Matches
             if "t1_from" in match:
                 prev_match = match["t1_from"]
                 if "w" in prev_match:
-                    dot.edge(f"M{prev_match['w']}", f"M{match_id}")
+                    dot.edge(f"M{prev_match['w']}", f"M{match_id}", color="black", penwidth="2")
                 elif "l" in prev_match:
-                    dot.edge(f"M{prev_match['l']}", f"M{match_id}")
-            
+                    dot.edge(f"M{prev_match['l']}", f"M{match_id}", style="dashed", color="gray")
+
             if "t2_from" in match:
                 prev_match = match["t2_from"]
                 if "w" in prev_match:
-                    dot.edge(f"M{prev_match['w']}", f"M{match_id}")
+                    dot.edge(f"M{prev_match['w']}", f"M{match_id}", color="black", penwidth="2")
                 elif "l" in prev_match:
-                    dot.edge(f"M{prev_match['l']}", f"M{match_id}")
-        
+                    dot.edge(f"M{prev_match['l']}", f"M{match_id}", style="dashed", color="gray")
+
         return dot
 
     # Bestimme die league_id anhand der ausgewählten Liga
