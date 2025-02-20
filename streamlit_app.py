@@ -1,10 +1,10 @@
 import streamlit as st
 import pandas as pd
-# import pyarrow.parquet as pq
-# import matplotlib.pyplot as plt
-# import seaborn as sns
-# import ast
 import numpy as np
+import streamlit as st
+import graphviz
+import json
+import requests
 
 # --- Streamlit-Setup ---
 st.set_page_config(page_title="SLR 2024 Dashboard", layout="wide")
@@ -23,14 +23,7 @@ def load_matchups():
 @st.cache_data
 def load_rosters():
     rosters = pd.read_parquet('league_stats/rosters/rosters.parquet', engine='pyarrow')
-    # rosters['starters'] = rosters['starters'].apply(lambda x: x.tolist() if isinstance(x, np.ndarray) else x)
-    # rosters['players'] = rosters['players'].apply(lambda x: x.tolist() if isinstance(x, np.ndarray) else x)
-    # rosters['reserve'] = rosters['reserve'].apply(lambda x: x.tolist() if isinstance(x, np.ndarray) else x)
-    # rosters['bench'] = rosters.apply(lambda row: [p for p in row['players'] if p not in row['starters']], axis=1)
-    # rosters[['QB', 'RB1', 'RB2', 'WR1', 'WR2', 'TE', 'FL', 'K', 'DEF']] = pd.DataFrame(rosters['starters'].to_list(), index=rosters.index)
-    # metadata = rosters['metadata'].apply(pd.Series)
     settings = rosters['settings'].apply(pd.Series)
-    # rosters = rosters.drop(columns=['metadata']).join(metadata)
     rosters = rosters.drop(columns=['settings']).join(settings)
     rosters['fpts'] = round(rosters['fpts'] + rosters['fpts_decimal'] / 100,2)
     rosters['fpts_against'] = round(rosters['fpts_against'] + rosters['fpts_against_decimal'] / 100,2)
@@ -71,9 +64,11 @@ def get_matchup_results(matchdf, userdf):
     matchups = matchups.rename(columns={"display_name": "loser_name"}).drop(columns=["roster_id", 'user_id', 'draft_pos'])
     return matchups
 
-matchups_df = load_matchups()
-rosters_df = load_rosters()
 users_df = load_users()
+matchups_df = load_matchups()
+matchups_df = matchups_df.merge(users_df[['league_id', 'roster_id', 'display_name', 'league_name']], on=['league_id', 'roster_id'], how='left')
+rosters_df = load_rosters()
+
 players_df, players_dict = load_players()
 matches_df = get_matchup_results(matchdf=matchups_df, userdf=users_df)
 
@@ -167,7 +162,7 @@ with tab3:
         # Top 5 Roster
         st.subheader('🏆 Top 5 Roster')
         top_roster_df = matchups_df[matchups_df['week']==select_week]
-        top_roster_df = top_roster_df.merge(users_df[['league_id', 'roster_id', 'display_name', 'league_name']], on=['league_id', 'roster_id'], how='left')
+        # top_roster_df = top_roster_df.merge(users_df[['league_id', 'roster_id', 'display_name', 'league_name']], on=['league_id', 'roster_id'], how='left')
         top_roster_df = top_roster_df[['display_name', 'points', 'league_name', 'QB', 'RB1','RB2','WR1', 'WR2', 'TE', 'FL', 'K', 'DEF']].sort_values(by='points', ascending=False).head(5)
         top_roster_df = top_roster_df.rename(columns={
             'display_name':'Manager', 'points':'Punkte', 'league_name':'Liga'
@@ -178,7 +173,7 @@ with tab3:
 
 with tab4:
     st.title("Wöchentliche Statistiken")
-    weeklystats_show = rosters_df[['league_name', 'display_name', 'week', 'wins', 'losses', 'ties', 'fpts', 'fpts_against', 'ppts']]
+    weeklystats_show = rosters_df[['league_name', 'display_name', 'week', 'wins','losses', 'ties', 'fpts', 'fpts_against', 'ppts']]
     weeklystats_show['St/Sit-Acc. [%]'] = round(weeklystats_show['fpts'] / weeklystats_show['ppts'] * 100,2)
     weekly_league = st.selectbox('Wähle Liga:', weeklystats_show['league_name'].unique())
     weekly_week = st.selectbox('Wähle Woche:', weeklystats_show['week'].unique())
@@ -199,6 +194,88 @@ with tab4:
         filtered_weekly = weeklystats_show
     filtered_weekly = filtered_weekly.sort_values(by=['W', 'FPTS for'], ascending=False).reset_index(drop=True)
     st.dataframe(filtered_weekly, hide_index=True)
+
+    def get_team_info(lid, rid, rnum, matchups):
+        week = 14 + rnum
+        match = matchups[
+            (matchups["league_id"] == lid) &
+            (matchups["roster_id"] == rid) &
+            (matchups["week"] == week)
+        ]
+        
+        if not match.empty:
+            return match.iloc[0]["display_name"], match.iloc[0]["points"]
+        return "Unknown", 0  # Falls keine Daten gefunden werden
+
+    def build_bracket_graph(data, league_id, matchups_df):
+        dot = graphviz.Digraph(format='png')
+        dot.attr('node', shape='rectangle')
+        
+        for match in data:
+            match_id = match["m"]
+            round_num = match["r"]
+            place = match.get("p")
+            
+            team1_id = match["t1"]
+            team2_id = match["t2"]
+
+            team1_name, team1_points = get_team_info(league_id, team1_id, round_num, matchups_df)
+            team2_name, team2_points = get_team_info(league_id, team2_id, round_num, matchups_df)
+
+            label = f"Week {14+round_num}\n{team1_name} ({team1_points}) \n {team2_name} ({team2_points})"
+            if place is not None:
+                label = f"Week {14+round_num}, Spiel um Pl. {place}\n{team1_name} ({team1_points}) \n {team2_name} ({team2_points})"
+            
+            dot.node(f"M{match_id}", label=label)
+            
+            if "t1_from" in match:
+                prev_match = match["t1_from"]
+                if "w" in prev_match:
+                    dot.edge(f"M{prev_match['w']}", f"M{match_id}")
+                elif "l" in prev_match:
+                    dot.edge(f"M{prev_match['l']}", f"M{match_id}")
+            
+            if "t2_from" in match:
+                prev_match = match["t2_from"]
+                if "w" in prev_match:
+                    dot.edge(f"M{prev_match['w']}", f"M{match_id}")
+                elif "l" in prev_match:
+                    dot.edge(f"M{prev_match['l']}", f"M{match_id}")
+        
+        return dot
+
+    # Bestimme die league_id anhand der ausgewählten Liga
+    league_ids = rosters_df.loc[rosters_df['league_name'] == weekly_league, 'league_id'].unique()
+    if len(league_ids) > 0:
+        league_id = league_ids[0]
+    else:
+        st.error("Keine gültige Liga-ID gefunden.")
+        st.stop()
+
+    # API-Aufruf zur Abfrage des Playoff-Brackets
+    winner_url = f"https://api.sleeper.app/v1/league/{league_id}/winners_bracket"
+    loser_url = f"https://api.sleeper.app/v1/league/{league_id}/losers_bracket"
+    winner_response = requests.get(winner_url)
+    loser_respone = requests.get(loser_url)
+
+    if winner_response.status_code == 200:
+        winner_bracket_data = winner_response.json()
+    else:
+        st.error(f"Fehler beim Abrufen der Playoff-Daten: {winner_response.status_code}")
+        st.stop() 
+    if loser_respone.status_code == 200:
+        loser_bracket_data = loser_respone.json()
+    else:
+        st.error(f"Fehler beim Abrufen der Playoff-Daten: {loser_respone.status_code}")
+        st.stop() 
+    winner_graph = build_bracket_graph(winner_bracket_data, league_id, matchups_df)
+    loser_graph = build_bracket_graph(loser_bracket_data, league_id, matchups_df)
+    winner_graph.graph_attr.update({'rankdir': 'LR'})
+    loser_graph.graph_attr.update({'rankdir': 'LR'})
+    st.title("Playoff Picture")
+    st.graphviz_chart(winner_graph)
+    st.title("Toilet Bowl")
+    st.graphviz_chart(loser_graph)
 
 # --- User ---
 with tab5:
@@ -224,7 +301,7 @@ with tab5:
 
     st.markdown(filtered_df.to_html(escape=False, index=False), unsafe_allow_html=True)
 
-# --- Matchups ---
+# --- NFL Player ---
 with tab6:
     st.write('Hier gibt es noch nichts zu sehen. Stay tuned!')
     # st.title("Wöchentliche Matchups")
