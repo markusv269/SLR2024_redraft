@@ -9,7 +9,7 @@ import os
 
 # --- Streamlit-Setup ---
 st.set_page_config(page_title="SLR 2024 Dashboard", layout="wide")
-tab1,tab2,tab3,tab4,tab5,tab6,tab7 = st.tabs(["🏠 Start", "📊 Matchups", "📅 Wochenkategorien", "📋 Statistiken", "👨‍👨‍👧‍👦 Users", "NFL Player", "SLR Ligen"])
+tab1,tab2,tab3,tab4,tab5,tab6,tab7,tab8 = st.tabs(["🏠 Start", "📊 Matchups", "📅 Wochenkategorien", "📋 Statistiken", "👨‍👨‍👧‍👦 Users", "NFL Player", "SLR Ligen", "Sandbox"])
 
 # --- Daten laden mit Caching ---
 @st.cache_data
@@ -137,7 +137,9 @@ with tab1:
 
 with tab2:
     st.title('Matchup-Übersicht')
-    st.write('Übersicht über alle Matchups. Filter nach Woche, Liga oder bestimmten Manager (zeigt alle gewonnenen und verlorernen Spiele).')
+    st.write('''Übersicht über alle Matchups. Filter nach Woche, Liga oder bestimmten Manager (zeigt alle gewonnenen und verlorernen Spiele).
+             \n_Aus Performance-Gründen werden maximal 100 Matchups angezeigt._''')
+
     matches_show = matches_df[['league_name', 'week', 'winner_name', 'winner_points', 'loser_name', 'loser_points']]
     matches_show = matches_show.rename(columns={
         'league_name' : 'Liga',
@@ -149,33 +151,69 @@ with tab2:
     })
     matches_show['Pkt. Summe'] = matches_show['Pkt. Gewinner'] + matches_show['Pkt. Verlierer']
     matches_show['Pkt. Diff'] = matches_show['Pkt. Gewinner'] - matches_show['Pkt. Verlierer']
-    # Filter-Auswahl direkt über der Tabelle
-    col1, col2 = st.columns(2)
+   
+   
+    # Filter-UI
+    ucol1, ucol2, ucol3 = st.columns([1, 1, 1.6])
+    dcol1, dcol2, dcol3 = st.columns([1, 1, 1.6])
 
-    with col1:
-        filter_type = st.selectbox('Filter:', ['Alle', 'Woche', 'Liga', 'Manager'], key="filter_type")
+    with ucol1:
+        activate_league = st.checkbox("Ligafilter aktivieren", key="cb_league")
+    with ucol2:
+        activate_week = st.checkbox("Wochenfilter aktivieren", key="cb_week")
 
-    with col2:
-        if filter_type != "Alle":
-            filter_options = {
-                "Woche": sorted(matches_show['Woche'].unique()),
-                "Liga": sorted(matches_show['Liga'].unique()),
-                "Manager": sorted(set(matches_show['Gewinner']).union(set(matches_show['Verlierer'])))
-            }
-            filter_value = st.selectbox(f"{filter_type} auswählen", filter_options[filter_type], key="filter_value")
-        else:
-            filter_value = None
+    # Bedingte Filteroptionen
+    with dcol1:
+        select_league = st.selectbox("Wähle Liga", matches_show["Liga"].unique(), key="sel_league") if activate_league else None
+    with dcol2:
+        select_week = st.selectbox("Wähle Woche", sorted(matches_show["Woche"].unique()), key="sel_week") if activate_week else None
+    with dcol3:
+        select_manager = st.multiselect("Manager wählen", sorted(set(matches_show["Gewinner"]).union(set(matches_show["Verlierer"]))))
 
-    # Filter anwenden
-    if filter_type == "Woche":
-        matches_show = matches_show[matches_show['Woche'] == filter_value]
-    elif filter_type == "Liga":
-        matches_show = matches_show[matches_show['Liga'] == filter_value]
-    elif filter_type == "Manager":
-        matches_show = matches_show[(matches_show['Gewinner'] == filter_value) | (matches_show['Verlierer'] == filter_value)]
+    # Daten filtern
+    filtered_df = matches_show.copy()
+
+    if activate_league and select_league:
+        filtered_df = filtered_df[filtered_df["Liga"] == select_league]
+
+    if activate_week and select_week:
+        filtered_df = filtered_df[filtered_df["Woche"] == select_week]
+
+    if select_manager:
+        filtered_df = filtered_df[filtered_df["Gewinner"].isin(select_manager) | filtered_df["Verlierer"].isin(select_manager)]
+
+    # Dynamische Spaltenauswahl
+    column_order = [col for col in filtered_df.columns if col not in (["Liga"] if activate_league else []) + (["Woche"] if activate_week else [])]
 
     # Gefilterte Tabelle anzeigen
-    st.dataframe(matches_show, hide_index=True)
+    # st.dataframe(filtered_df, column_order=column_order, hide_index=True)
+    filtered_df = filtered_df.head(100)
+
+    st.write("### Matchups")
+    matchups_per_row = 4
+    rows = [filtered_df.iloc[i:i+matchups_per_row] for i in range(0, len(filtered_df), matchups_per_row)]
+
+    for row in rows:
+        cols = st.columns(matchups_per_row)
+        for col, (_, matchup) in zip(cols, row.iterrows()):
+            with col:
+                st.markdown(
+                    f"""
+                    <div style="border:1px solid #ddd; border-radius:10px; padding:10px; text-align:center; background-color:#f9f9f9;">
+                        <div style="font-size:11px; font-weight:bold; color:#555;">{matchup['Liga']} - Woche {matchup['Woche']}</div>
+                        <hr style="margin:5px 0; border-top:1px solid #ddd;">
+                        <div style="font-size:16px; font-weight:bold; color:#28a745;">{matchup['Gewinner']}</div>
+                        <div style="font-size:13px; color:gray;">{matchup['Pkt. Gewinner']:.2f}</div>
+                        <div style="font-size:20px; font-weight:bold;">:</div>
+                        <div style="font-size:13px; color:gray;">{matchup['Pkt. Verlierer']:.2f}</div>
+                        <div style="font-size:16px; font-weight:bold; color:#dc3545;">{matchup['Verlierer']}</div>
+                    </div>
+                    """, 
+                    unsafe_allow_html=True
+                )
+        st.markdown("<div style='margin-bottom: 20px;'></div>", unsafe_allow_html=True)
+    # st.subheader("Alle Matchups eines Managers")
+
 
 # --- Wochenkategorien ---
 with tab3:
@@ -406,7 +444,7 @@ with tab6:
         return player_data
 
     def create_combined_df(weeks, scoring_settings):
-        """Erstellt ein DataFrame mit 'player_id' sowie proj_{week} und stats_{week}-Spalten."""
+        """Erstellt ein DataFrame mit 'player_id' sowie proj und stats als Listen über alle Wochen."""
         all_data = {}
 
         for week in weeks:
@@ -417,20 +455,19 @@ with tab6:
             proj_stats = load_player_data(proj_file, scoring_settings, is_projection=True)
             for player_id, stats in proj_stats.items():
                 if player_id not in all_data:
-                    all_data[player_id] = {}
-                all_data[player_id][f'proj_{week}'] = calculate_fantasy_points(stats, scoring_settings)
+                    all_data[player_id] = {"proj": [], "stats": []}  # Initialisierung
+                all_data[player_id]["proj"].append(calculate_fantasy_points(stats, scoring_settings))
 
             # Tatsächliche Stats laden
             actual_stats = load_player_data(stats_file, scoring_settings, is_projection=False)
             for player_id, stats in actual_stats.items():
                 if player_id not in all_data:
-                    all_data[player_id] = {}
-                all_data[player_id][f'stats_{week}'] = calculate_fantasy_points(stats, scoring_settings)
+                    all_data[player_id] = {"proj": [], "stats": []}  # Initialisierung
+                all_data[player_id]["stats"].append(calculate_fantasy_points(stats, scoring_settings))
 
         # DataFrame erstellen
-        df = pd.DataFrame.from_dict(all_data, orient='index').reset_index()
-        df.rename(columns={'index': 'player_id'}, inplace=True)
-        df = df.fillna(0)
+        df = pd.DataFrame.from_dict(all_data, orient="index").reset_index()
+        df.rename(columns={"index": "player_id"}, inplace=True)
 
         return df
 
@@ -442,12 +479,40 @@ with tab6:
     players_df = players_df.merge(df_combined, on='player_id', how='right')
 
     # Ausgabe in Streamlit
-    players_show = players_df[['full_name', 'team', 'position'] + [f"stats_{week}" for week in weeks] + [f"proj_{week}" for week in weeks]]
-    players_show['fpts_total'] = players_show[[f"stats_{week}" for week in weeks]].sum(axis=1)
-    players_show['proj_total'] = players_show[[f"proj_{week}" for week in weeks]].sum(axis=1)
+    players_show = players_df[['full_name', 'team', 'position', "stats", "proj"]]
+    # players_show['fpts_total'] = players_show[[f"stats_{week}" for week in weeks]].sum(axis=1)
+    # players_show['proj_total'] = players_show[[f"proj_{week}" for week in weeks]].sum(axis=1)
 
     players_show = players_show.dropna(subset=['full_name'], axis=0)
-    st.dataframe(players_show)
+
+    def display_df(df):
+        st.dataframe(
+            df,
+            column_order=[
+                column
+                for column in list(df.columns)
+                if column in [
+                    'full_name',
+                    'team',
+                    'position',
+                    "stats",
+                    "proj"
+                ]
+            ],
+            column_config={
+                "stats": st.column_config.AreaChartColumn(
+                    "Stats",
+                    width="medium",
+                    help="Fantasy Points per Week"),
+                "proj": st.column_config.AreaChartColumn(
+                    "Projection",
+                    width="medium",
+                    help="Projected Fantasy Points per Week"),
+            },
+            hide_index=True,
+            height=2500
+        )
+    display_df(players_show)
 
 with tab7:
     st.title("Die Stoned Lack Redraft Ligen 2024")
@@ -530,4 +595,21 @@ with tab7:
             st.subheader(category)
             st.dataframe(df.set_index("Sleeper-Stat"), hide_index=True)
 
-    # st.json(scoring_settings)
+
+# with tab8:
+#     def column_manager(df1,df2):
+#         left_widget, right_widget, _ = st.columns([1,1,1.5])
+#         selected_ticker = left_widget.selectbox(
+#             "Filter:",
+#             list(df1.keys()),
+#         )
+#         selected_period = right_widget.selectbox(
+#             "Period",
+#             ("Week", "League", "Manager"),
+#             2,
+#         )
+#         st.header(selected_ticker)
+#         st.header(selected_period)
+    
+#     column_manager(players_df, matches_df)
+#     # st.json(scoring_settings)
