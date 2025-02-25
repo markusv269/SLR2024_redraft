@@ -1,14 +1,13 @@
 import streamlit as st
-from tools.methods import load_matchups, load_players, load_rosters, load_scoring_settings, load_users, get_matchup_results
+# from tools.methods import load_matchups, load_players, load_rosters, load_scoring_settings, load_users, get_matchup_results
 
 import requests
 import graphviz
 
 st.title("Wochenkategorien")
-users_df = load_users()
-matchups_df = load_matchups()
-matchups_df = matchups_df.merge(users_df[['league_id', 'roster_id', 'display_name', 'league_name']], on=['league_id', 'roster_id'], how='left')
-rosters_df = load_rosters()
+users_df = st.session_state["userdf"]
+matchups_df = st.session_state["matchupsdf"]
+rosters_df = st.session_state["rostersdf"]
 
 st.title("Wöchentliche Statistiken")
 weeklystats_show = rosters_df[['league_name', 'display_name', 'week', 'wins','losses', 'ties', 'fpts', 'fpts_against', 'ppts']]
@@ -86,7 +85,7 @@ def build_bracket_graph(data, league_id, matchups_df):
     return dot
 
 # Bestimme die league_id anhand der ausgewählten Liga
-league_ids = rosters_df.loc[rosters_df['league_name'] == weekly_league, 'league_id'].unique()
+league_ids = rosters_df.loc[rosters_df['Liga'] == weekly_league, 'league_id'].unique()
 if len(league_ids) > 0:
     league_id = league_ids[0]
 else:

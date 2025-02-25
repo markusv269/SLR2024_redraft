@@ -3,8 +3,6 @@ import pandas as pd
 import numpy as np
 import streamlit as st
 
-# --- Daten laden mit Caching ---
-@st.cache_data
 def load_matchups():
     matchups = pd.read_parquet('league_stats/matchups/matchups.parquet', engine='pyarrow')
     matchups['starters'] = matchups['starters'].apply(lambda x: x.tolist() if isinstance(x, np.ndarray) else x)
@@ -13,7 +11,6 @@ def load_matchups():
     matchups[['QB', 'RB1', 'RB2', 'WR1', 'WR2', 'TE', 'FL', 'K', 'DEF']] = pd.DataFrame(matchups['starters'].to_list(), index=matchups.index)
     return matchups
 
-@st.cache_data
 def load_rosters():
     rosters = pd.read_parquet('league_stats/rosters/rosters.parquet', engine='pyarrow')
     settings = rosters['settings'].apply(pd.Series)
@@ -24,12 +21,10 @@ def load_rosters():
     rosters = rosters.drop(columns=['fpts_decimal', 'fpts_against_decimal', 'ppts_decimal', 'starters'])
     return rosters
 
-@st.cache_data
 def load_users():
     users = pd.read_parquet('league_stats/users.parquet', engine='pyarrow')
     return users
 
-@st.cache_data
 def load_players():
     players = pd.read_json('sleeper_stats/players/players.json')
     players = players.T.reset_index(drop=True)
@@ -37,7 +32,6 @@ def load_players():
     player_dict = players.set_index("player_id")["full_name"].to_dict()
     return players, player_dict
 
-@st.cache_data
 def get_matchup_results(matchdf, userdf):
     matchups = matchdf.groupby(["league_id", "week", "matchup_id"]).apply(
         lambda x: pd.Series({
@@ -57,7 +51,6 @@ def get_matchup_results(matchdf, userdf):
     matchups = matchups.rename(columns={"display_name": "loser_name"}).drop(columns=["roster_id", 'user_id', 'draft_pos'])
     return matchups
 
-@st.cache_data
 def load_scoring_settings():
     scoring_settings = {
         "sack": 1,

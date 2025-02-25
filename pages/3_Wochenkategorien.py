@@ -2,13 +2,14 @@ import streamlit as st
 from tools.methods import load_matchups, load_players, load_rosters, load_scoring_settings, load_users, get_matchup_results
 
 st.title("Wochenkategorien")
-users_df = load_users()
-matchups_df = load_matchups()
-matchups_df = matchups_df.merge(users_df[['league_id', 'roster_id', 'display_name', 'league_name']], on=['league_id', 'roster_id'], how='left')
-rosters_df = load_rosters()
+# users_df = load_users()
+# matchups_df = load_matchups()
+# matchups_df = matchups_df.merge(users_df[['league_id', 'roster_id', 'display_name', 'league_name']], on=['league_id', 'roster_id'], how='left')
+# rosters_df = load_rosters()
 
-players_df, players_dict = load_players()
-matches_df = get_matchup_results(matchdf=matchups_df, userdf=users_df)
+# players_df, players_dict = load_players()
+matches_df = st.session_state["matchesdf"]
+matchups_df = st.session_state["matchupsdf"]
 
 if not matches_df.empty:
     matches_df['pts_total'] = round(matches_df['winner_points'] + matches_df['loser_points'],2)
