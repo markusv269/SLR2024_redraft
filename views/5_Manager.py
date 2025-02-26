@@ -1,7 +1,6 @@
 import streamlit as st
 from tools.methods import load_matchups, load_players, load_rosters, load_scoring_settings, load_users, get_matchup_results
 
-st.title("Wochenkategorien")
 users_df = load_users()
 matchups_df = load_matchups()
 matchups_df = matchups_df.merge(users_df[['league_id', 'roster_id', 'display_name', 'league_name']], on=['league_id', 'roster_id'], how='left')

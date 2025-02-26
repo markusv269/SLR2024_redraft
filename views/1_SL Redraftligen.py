@@ -1,14 +1,30 @@
 import streamlit as st
 import pandas as pd
 
-st.title("Die Stoned Lack Redraft Ligen 2024")
-st.header("Settings")
-# st.subheader("Roster uns sonstige Einstellungen")
-st.write("Die SLR Ligen werden mit 12 Managern gespielt. Jedes Team besteht aus 15 Spielern. Das Starting Lineup besteht aus")
-st.write("1 QB, 2 RB, 2 WR, 1 TE, 1 Flex, 1 K, 1 DST.")
-st.write("Jeder Manager erhält zu Beginn der Saison 100 $ FAAB (Waiver Budget).")
-st.header("Scoring")
-st.write("Das Scoring entspricht dem PPR-Scoring (1 Punkt je Reception) mit den üblichen Einstellungen. Die gesamten Scoring-Settings können den nachfolgenden Tabellen entnommen werden")
+st.write(
+    '''
+    # Die Stoned Lack Redraft Ligen 2024
+    ## Settings
+    ### Roster uns sonstige Einstellungen
+    Die SLR Ligen werden mit 12 Managern gespielt. Jedes Team besteht aus 15 Spielern.
+    Das Starting Lineup besteht aus
+
+    - 1 Quarterback (QB),
+    - 2 Running Backs (RB), 
+    - 2 Wide Receiver (WR), 
+    - 1 Tight End (TE),
+    - 1 Flexposition (WR/RB),
+    - 1 Kicker (K),
+    - 1 Defense/Special Teams (DST).
+    
+    Jeder Manager erhält zu Beginn der Saison 100 $ FAAB (Waiver Budget). 
+    Mit diesem Budget können über die Saison hinweg Spieler vom Waiver geholt werden.
+    Dabei gilt das Prinzip einer versteckten Auktion. Der Manager, der am meisten auf einen Spieler gesetzt hat,
+    bekommt den Spieler vom Waiver (vorausgesetzt er darf ihn erhalten).
+    
+    ## Scoring
+    Das Scoring entspricht dem PPR-Scoring (1 Punkt je Reception) mit den üblichen Einstellungen. 
+    Die gesamten Scoring-Settings können den nachfolgenden Tabellen entnommen werden''')
 
 # Kategorien definieren
 categories = {

@@ -4,10 +4,10 @@ import streamlit as st
 import requests
 import graphviz
 
-st.title("Wochenkategorien")
 users_df = st.session_state["userdf"]
 matchups_df = st.session_state["matchupsdf"]
 rosters_df = st.session_state["rostersdf"]
+rosters_df = rosters_df.merge(users_df, on=['league_id', 'roster_id'], how='left')
 
 st.title("Wöchentliche Statistiken")
 weeklystats_show = rosters_df[['league_name', 'display_name', 'week', 'wins','losses', 'ties', 'fpts', 'fpts_against', 'ppts']]
@@ -30,7 +30,7 @@ if weekly_week != None and weekly_league != None:
 else:
     filtered_weekly = weeklystats_show
 filtered_weekly = filtered_weekly.sort_values(by=['W', 'FPTS for'], ascending=False).reset_index(drop=True)
-st.dataframe(filtered_weekly, hide_index=True)
+st.dataframe(filtered_weekly, hide_index=True, height=460, width=1000)
 
 def get_team_info(lid, rid, rnum, matchups):
     week = 14 + rnum
@@ -85,7 +85,7 @@ def build_bracket_graph(data, league_id, matchups_df):
     return dot
 
 # Bestimme die league_id anhand der ausgewählten Liga
-league_ids = rosters_df.loc[rosters_df['Liga'] == weekly_league, 'league_id'].unique()
+league_ids = rosters_df.loc[rosters_df['league_name'] == weekly_league, 'league_id'].unique()
 if len(league_ids) > 0:
     league_id = league_ids[0]
 else:
