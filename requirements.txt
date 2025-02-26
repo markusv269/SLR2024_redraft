@@ -3,4 +3,5 @@ matplotlib
 pandas
 seaborn
 pyarrow
+sleeper-api-wrapper
 graphviz
