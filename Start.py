@@ -23,7 +23,7 @@ hot_takes = st.Page(
     page="views/1_hottakes.py",
     title="Hottake-Sammlung",
     icon=":material/whatshot:"
-)
+    )
 
 redraft_front_page = st.Page(
     page="views/RED_info.py",
