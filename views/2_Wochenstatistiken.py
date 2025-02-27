@@ -30,7 +30,7 @@ if weekly_week != None and weekly_league != None:
 else:
     filtered_weekly = weeklystats_show
 filtered_weekly = filtered_weekly.sort_values(by=['W', 'FPTS for'], ascending=False).reset_index(drop=True)
-st.dataframe(filtered_weekly, hide_index=True, height=460, width=1000)
+st.dataframe(filtered_weekly.set_index("Liga"), hide_index=True, height=460, width=1000)
 
 def get_team_info(lid, rid, rnum, matchups):
     week = 14 + rnum
