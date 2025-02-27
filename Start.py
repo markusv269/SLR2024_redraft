@@ -65,7 +65,7 @@ pg = st.navigation(
     {
         "Start" : [
             start_page,
-            # hot_takes
+            hot_takes
             ],
         "Redraft" : [
             redraft_front_page,
