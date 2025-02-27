@@ -1,7 +1,7 @@
 import streamlit as st
 
 st.write('''
-    # Das StonedLack Universum
+    # Das StonedLack Universum 🏈
 
     ## About
     Willkommen auf der Streamlit-Infoseite des StonedLack Fantasy Football Podcasts. 
@@ -30,5 +30,11 @@ st.write('''
     Angefangen hat alles mit der Idee, ein ADP-Draftboard aus allen Ligen zu generieren, also ein Spielerranking über alle Drafts der 2023er-StonedLack Redraftligen zu erstellen.
     In der Folge habe ich begonnen, wöchentliche Updates zu allen Ligen in Discord zu schreiben. Motivation war auch, die Programmiersprache `python` besser kennen zu lernen.
          
-    Nun mündet das Ganze in meinem vorerst größten und sichtbarstem Projekt, dieser Streamlit-Plattform.    
+    Nun mündet das Ganze in meinem vorerst größten und sichtbarstem Projekt, dieser Streamlit-Plattform. 
+    Der Gedanke dahinter ist, für die kommende Fantasy-Saison eine Plattform zu bauen, in der man mehr Informationen bieten und darstellen kann,
+    als in einer Discord-Nachricht. Daher ist die Seite auch noch ständigen Updates und Änderungen ausgesetzt.
+         
+    Wer Ideen und Wünsche hat, kann diese gern äußern und mir im Discord schreiben. Ihr wisst ja, wo Ihr mich finden könnt.😉
+         
+    Viel Spaß auf der Seite und bei Fantasy Football!
 ''')

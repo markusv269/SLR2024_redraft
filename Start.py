@@ -14,50 +14,59 @@ def feedback():
 
 start_page = st.Page(
     page="views/0_start.py",
-    title="Das Stoned Lack Universe",
+    title="Das StonedLack Universum",
     icon=":material/home:",
     default=True
     )
 
+hot_takes = st.Page(
+    page="views/1_hottakes.py",
+    title="Hottake-Sammlung",
+    icon=":material/whatshot:"
+)
+
 redraft_front_page = st.Page(
-    page="views/1_SL Redraftligen.py",
+    page="views/RED_info.py",
     title="Die Redraftligen",
     icon=":material/home:"
     )
 
 redraft_weekly_page = st.Page(
-    page="views/2_Wochenstatistiken.py",
+    page="views/RED_Wochenstatistiken.py",
     title="Wochenstatistiken",
     icon=":material/calendar_month:"
 )
 
 redraft_weekly_cat = st.Page(
-    page="views/3_Wochenkategorien.py",
+    page="views/RED_Wochenkategorien.py",
     title="Wochenkategorien",
     icon=":material/bar_chart:"
 )
 
 redraft_matchups = st.Page(
-    page="views/4_Matchups.py",
+    page="views/RED_Matchups.py",
     title="Matchups",
     icon=":material/sports_football:"
 )
 
 redraft_manager = st.Page(
     title="Manager",
-    page="views/5_Manager.py",
+    page="views/RED_Manager.py",
     icon=":material/groups:"
 )
 
 dynasty_start = st.Page(
-    page="views/7_dynasty.py",
+    page="views/DYN_info.py",
     title="Dynasty",
     icon=":material/construction:"
 )
 
 pg = st.navigation(
     {
-        "Start" : [start_page],#feedback_page],
+        "Start" : [
+            start_page,
+            hot_takes
+            ],
         "Redraft" : [
             redraft_front_page,
             redraft_weekly_page,
@@ -69,7 +78,7 @@ pg = st.navigation(
     }
 )
 
-st.sidebar.write("Made by GoKingsGo", )
+st.sidebar.write("by GoKingsGo, 2025", )
 
 pg.run()
 
