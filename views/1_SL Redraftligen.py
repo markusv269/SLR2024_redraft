@@ -86,13 +86,12 @@ for category, keys in categories.items():
     for key in keys:
         if key in st.session_state["scoring"]:
             data.append({
-                # "Kategorie": category,
-                # "Sleeper-Stat": key,
                 "Beschreibung": descriptions.get(key, "Keine Beschreibung verfügbar"),
                 "Punkte": st.session_state["scoring"][key]
             })
 
     if data:
         df = pd.DataFrame(data)
+        df["Punkte"] = df["Punkte"].astype("float")
         st.subheader(category)
-        st.table(df.set_index("Beschreibung"))#, hide_index=True)
+        st.table(df.set_index("Beschreibung").style.format("{:.2}"))

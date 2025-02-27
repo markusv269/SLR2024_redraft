@@ -52,10 +52,11 @@ for league_id in dynasty_leagues:
     if league_data['name'] not in league_overview.keys():
         league_overview[league_data['name']] = league_data['league_id']
 
+league_df = pd.DataFrame([league_overview]).T.reset_index(drop=False).rename(columns={"index":"Liga", 0:"League-ID"})
 st.write('''
     ### Die Stoned Lack Dynasty-Ligen
     ''')
-st.table(league_overview.keys())
+st.table(league_df.set_index("Liga"))
 
 
 
