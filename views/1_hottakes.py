@@ -46,7 +46,7 @@ def load_from_airtable():
     return pd.DataFrame(columns=["Quelle", "Wo", "Aussage", "Datum"])
 
 def main():
-    st.title("Zitate-Formular mit Airtable")
+    st.title("Die StonedLack Hot Takes Sammlung")
 
     with st.form("quote_form"):
         option = st.radio("Wähle eine Option:", ["Stoni sagt", "Lack sagt"])
