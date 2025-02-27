@@ -1,43 +1,51 @@
 import streamlit as st
 import pandas as pd
-import os
+import requests
+import json
 
-CSV_FILE = "aussagen.csv"
+# Airtable Konfiguration
+AIRTABLE_API_KEY = st.secrets["airtable"]["api_key"]
+BASE_ID = st.secrets["airtable"]["base_id"]
+TABLE_NAME = st.secrets["airtable"]["table_name"]
 
-def load_data():
-    """Lädt bestehende Daten aus der CSV-Datei."""
-    if os.path.exists(CSV_FILE):
-        return pd.read_csv(CSV_FILE)
+# Funktion zum Speichern in Airtable
+def save_to_airtable(option, text):
+    url = f"https://api.airtable.com/v0/{BASE_ID}/{TABLE_NAME}"
+    headers = {
+        "Authorization": f"Bearer {AIRTABLE_API_KEY}",
+        "Content-Type": "application/json"
+    }
+    data = {"records": [{"fields": {"Quelle": option, "Aussage": text}}]}
+    response = requests.post(url, headers=headers, data=json.dumps(data))
+    return response.status_code == 200
+
+# Funktion zum Laden der Daten aus Airtable
+def load_from_airtable():
+    url = f"https://api.airtable.com/v0/{BASE_ID}/{TABLE_NAME}"
+    headers = {"Authorization": f"Bearer {AIRTABLE_API_KEY}"}
+    response = requests.get(url, headers=headers)
+    if response.status_code == 200:
+        records = response.json().get("records", [])
+        return pd.DataFrame([rec["fields"] for rec in records])
     return pd.DataFrame(columns=["Quelle", "Aussage"])
 
-def save_data(option, option_wo, text, date):
-    """Speichert die Eingaben in der CSV-Datei."""
-    df = load_data()
-    new_entry = pd.DataFrame([[option, option_wo, text, date]], columns=["Quelle", "Wo", "Aussage", "Datum"])
-    df = pd.concat([df, new_entry], ignore_index=True)
-    df.to_csv(CSV_FILE, index=False)
-
 def main():
-    st.title("Hot Takes Sammlung")
-    st.write("Wieder mal ein Hot Take von Stoni oder Lack? Hier ist der richtige Platz, um alle Aussagen abzuspeichern.")
-    st.write("Sammelt hier alle Hot Takes, um sie den beiden später vorhalten zu können oder ihr Fantasy-Genie-Dasein zu bekunden!")
+    st.title("Zitate-Formular mit Airtable")
 
     with st.form("quote_form"):
         option = st.radio("Wähle eine Option:", ["Stoni sagt", "Lack sagt"])
-        option_wo = st.radio("Wo wurde die Aussage gemacht?", ["Montags-Podcast", "Start&Sit", "Reel/Social Media", "Discord", "Sonstige"])
         text = st.text_area("Gib deinen Text ein:")
-        date = st.date_input("Wähle Datum der Aussage:", format="DD.MM.YYYY")
         submitted = st.form_submit_button("Absenden")
 
         if submitted and text.strip():
-            save_data(option, option_wo, text, date)
-            st.success(f"**{option}:** {text} am {date}")
-        else:
-            st.error("Bitte Text eingeben!")
+            if save_to_airtable(option, text):
+                st.success(f"**{option}:** {text}")
+            else:
+                st.error("Fehler beim Speichern in Airtable!")
 
-    # Lade und zeige die gespeicherten Aussagen
-    df = load_data()
+    # Lade und zeige gespeicherte Aussagen
+    df = load_from_airtable()
     st.subheader("Gespeicherte Aussagen")
-    st.table(df.set_index("Datum"))
+    st.dataframe(df)
 
 main()
