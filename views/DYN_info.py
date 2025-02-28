@@ -68,7 +68,7 @@ st.write('''
     ### Die Stoned Lack Dynasty-Ligen
     ''')
 st.dataframe(
-    league_df[["avatar_url", "Liga", 'Amt. Champion']],
+    league_df[["avatar_url", "Liga", 'Amt. Champion', "Saison"]],
     column_config={"avatar_url": st.column_config.ImageColumn(" ")},
     hide_index=True
 )
