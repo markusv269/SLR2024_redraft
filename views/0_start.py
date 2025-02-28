@@ -5,6 +5,9 @@ st.write('''
 
     ## About
     Willkommen auf der Streamlit-Infoseite des StonedLack Fantasy Football Podcasts. 
+         
+    _**Hinweis/Disclaimer:** Die Seite wird privat betrieben und dient nur dem Zwecke der Aufbereitung von frei zugänglichen Daten aus der sleeper-API ([Link](https://docs.sleeper.com/)).
+    Die Seite steht in keiner Verbindung zu den Podcast-Autoren und wird als zusätzliches Angebot ("Fan-Page") betrieben._
     
     #### Stoned _what_ !?
     StonedLack ist ein Live-Podcast der beiden Fantasy Football-Heads **Stoni** und **Lack** aus Wien.
