@@ -18,16 +18,18 @@ for league_id in dyn_leagues:
     draft_order = draft_data.get("draft_order", {})
     picks = draft.get_all_picks()
 
-    latest_pick = picks[-1]["metadata"] if picks else None
+    latest_pick = picks[-1] if picks else None
     if latest_pick:
         pick_data = [
-            latest_pick.get('first_name', 'Unknown'),
-            latest_pick.get('last_name', 'Unknown'),
-            latest_pick.get('position', 'Unknown'),
-            latest_pick.get('team', 'Unknown')
+            latest_pick["metadata"].get('first_name', 'Unknown'),
+            latest_pick["metadata"].get('last_name', 'Unknown'),
+            latest_pick["metadata"].get('position', 'Unknown'),
+            latest_pick["metadata"].get('team', 'Unknown'),
+            latest_pick["round"],
+            latest_pick["draft_slot"]
         ]
     else:
-        pick_data = ["Keine", "Daten.", "", ""]
+        pick_data = None
 
     col1, col2 = st.columns([1, 4], vertical_alignment="center")
     with col1:
@@ -50,5 +52,8 @@ for league_id in dyn_leagues:
     with col5:
         st.write("Latest Pick")
     with col6:
-        st.write(f"{pick_data[0]} {pick_data[1]} ({pick_data[2]}), {pick_data[3]} ")
+        if pick_data:
+            st.write(f"{pick_data[0]} {pick_data[1]} ({pick_data[2]}), {pick_data[3]} an {pick_data[4]}.{pick_data[5]} ")
+        else:
+            st.write("--")
     # st.write(f"Draftreihenfolge {draft_data['type']}, Start: {draft_data['start_time']} ")
