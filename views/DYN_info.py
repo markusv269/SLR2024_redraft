@@ -54,9 +54,8 @@ for league_id in dynasty_leagues:
     champ = league_data["metadata"].get("latest_league_winner_roster_id",None)
     if champ:
         owner_id = next((entry["owner_id"] for entry in roster_data if entry["roster_id"] == int(champ)), None)
-        if owner_id:
-            user = User(owner_id)
-            user_name = user.get_display_name()
+        user = User(owner_id)
+        user_name = user.get_display_name()
     if league_data['name'] not in league_overview.keys():
         league_overview[league_data['name']] = [league_data['league_id'], league_data["avatar"], league_data["season"], user_name]
     
