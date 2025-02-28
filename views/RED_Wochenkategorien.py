@@ -5,6 +5,10 @@ st.title("Wochenkategorien")
 
 matches_df = st.session_state["matchesdf"]
 matchups_df = st.session_state["matchupsdf"]
+players_df = st.session_state["playersdf"]
+players_dict = {}
+for index, row in players_df.iterrows():
+    players_dict[row['player_id']] = f"{row['first_name'][:1]}. {row['last_name']}"
 
 if not matches_df.empty:
     matches_df['pts_total'] = round(matches_df['winner_points'] + matches_df['loser_points'],2)
@@ -22,19 +26,41 @@ if not matches_df.empty:
         'pts_diff':'Pkt. Diff.'
     })
 
+    def week_show(df, by, asc, n):
+        st.dataframe(
+            df.sort_values(by=by, ascending=asc).head(n).style.set_properties(subset=[by],
+            **{'background-color': 'lightgray'}),
+            hide_index=True,
+            column_config={
+                "Verlierer Pkt." : st.column_config.NumberColumn(
+                    format="%.2f"
+                    ),
+                "Gewinner Pkt." : st.column_config.NumberColumn(
+                    format="%.2f"
+                    ),
+                "Matchup Pkt." : st.column_config.NumberColumn(
+                    format="%.2f"
+                    ),
+                "Pkt. Diff." : st.column_config.NumberColumn(
+                    format="%.2f"
+                    ),
+                "Punkte": st.column_config.NumberColumn(
+                    format="%.2f"
+                    ),
+            })
+
     # Shootout der Woche
     st.subheader('🔥 Shootout der Woche')
-    # shootout_df = week_df.groupby(['league_id', 'matchup_id'])['points'].sum().reset_index()
-    st.dataframe(week_df.sort_values(by='Matchup Pkt.', ascending=False).head(1).style.set_properties(subset=['Matchup Pkt.'], **{'background-color': 'gray'}), hide_index=True)
-    
+    week_show(week_df, "Matchup Pkt.", False, 1)
+
     # Klatsche der Woche
     st.subheader('💀 Klatsche der Woche')
-    # klatsche_df = week_df.groupby(['league_id', 'matchup_id'])['points'].agg(lambda x: x.max() - x.min()).reset_index()
-    st.dataframe(week_df.sort_values(by='Pkt. Diff.', ascending=False).head(1).style.set_properties(subset=['Pkt. Diff.'], **{'background-color': 'gray'}), hide_index=True)
+    week_show(week_df,'Pkt. Diff.', False,1)
+   
     
     # Nailbiter der Woche
     st.subheader('😱 Nailbiter der Woche')
-    st.dataframe(week_df.sort_values(by='Pkt. Diff.', ascending=True).head(1).style.set_properties(subset=['Pkt. Diff.'], **{'background-color': 'gray'}), hide_index=True)
+    week_show(week_df,'Pkt. Diff.', True,1)
     
     # Top 5 Roster
     st.subheader('🏆 Top 5 Roster')
@@ -44,6 +70,8 @@ if not matches_df.empty:
     top_roster_df = top_roster_df.rename(columns={
         'display_name':'Manager', 'points':'Punkte', 'league_name':'Liga'
     })
-    st.dataframe(top_roster_df.style.set_properties(subset=['Punkte'], **{'background-color': 'gray'}), hide_index=True)
+    for pos in ["QB", "RB1", "RB2", "WR1", "WR2", "TE", "FL", "K"]:
+        top_roster_df[pos] = top_roster_df[pos].map(players_dict)
+    week_show(top_roster_df,'Punkte', False,5)
 else:
     st.warning("Keine Daten für die ausgewählte Woche verfügbar.")
