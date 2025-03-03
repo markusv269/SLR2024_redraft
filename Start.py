@@ -183,7 +183,7 @@ start_page = st.Page(
 
 hot_takes = st.Page(
     page="views/1_hottakes.py",
-    title="Hottake-Sammlung",
+    title="Hot Takes-Sammlung",
     icon=":material/whatshot:"
     )
 
@@ -235,6 +235,12 @@ dynasty_draft = st.Page(
     icon=":material/target:"
 )
 
+redraft_oldleagues = st.Page(
+    page="views/RED_alte_Redrafts.py",
+    title="Send your old SLR",
+    icon=":material/send:"
+)
+
 pg = st.navigation(
     {
         "Start" : [
@@ -243,6 +249,7 @@ pg = st.navigation(
         ],
         "Redraft" : [
             redraft_front_page,
+            redraft_oldleagues,
             redraft_weekly_page,
             redraft_weekly_cat,
             redraft_matchups,

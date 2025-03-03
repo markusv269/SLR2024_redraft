@@ -61,9 +61,12 @@ def main():
             else:
                 st.error("Fehler beim Speichern in Airtable!")
 
-    # Lade und zeige gespeicherte Aussagen
     df = load_from_airtable()
-    st.subheader("Gespeicherte Aussagen")
-    st.dataframe(df)
+    # Gespeicherte Ligen anzeigen
+    if not df.empty:
+        st.subheader("Gespeicherte Hot Takes")
+        st.dataframe(df)
+    else:
+        st.info("Noch keine Hot Takes gespeichert.")
 
 main()
