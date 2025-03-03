@@ -103,7 +103,7 @@ if "redleagues" not in st.session_state:
 st.image("Pictures/SL_logo.png", width=150)
 st.logo("Pictures/SL_logo.png")
 def feedback():
-    return None
+    return 0
 
 def display_drafts(league_ids):
     for league_id in league_ids:
@@ -116,7 +116,18 @@ def display_drafts(league_ids):
         draft_data = draft.get_specific_draft()
         draft_order = draft_data.get("draft_order", {})
         draft_time = draft_data.get("start_time", None)
-        
+        draft_type = draft_data["settings"].get("player_type")
+        draft_mode = draft_data["type"]
+
+        if draft_type == 0:
+            draft_typ = "Rookie + Veteran Draft"
+        elif draft_type == 1:
+            draft_typ = "Rookie Draft"
+        elif draft_type == 2:
+            draft_typ = "Veteran Draft"
+        else:
+            draft_typ = "Draft"
+
         if draft_time:
             draft_time /= 1000  # Millisekunden in Sekunden
             draft_time_utc = datetime.fromtimestamp(draft_time, tz=timezone.utc)  # UTC-Zeit
@@ -125,7 +136,7 @@ def display_drafts(league_ids):
         else:
             draft_time_show = "--"
 
-        st.write(f"#### {league_data['name']} (Draft {draft_data['season']})")
+        st.write(f"#### {league_data['name']}")
 
         picks = draft.get_all_picks()
         latest_pick = picks[-1] if picks else None
@@ -141,12 +152,17 @@ def display_drafts(league_ids):
             ]
         else:
             pick_data = None
+        col11, col12 = st.columns([1,4])
+        with col11:
+            st.write("Draftmodus")
+        with col12:
+            st.write(f"{draft_typ} ({draft_mode}) {draft_data['season']}")
 
         col7, col8 = st.columns([1,4])
         with col7:
             st.write("Draftstart")
         with col8:
-            st.write(draft_time_show, "MESZ")
+            st.write(draft_time_show)
 
         col1, col2 = st.columns([1, 4])
         with col1:
@@ -262,6 +278,12 @@ redraft_oldleagues = st.Page(
     icon=":material/send:"
 )
 
+redraft_overview = st.Page(
+    page="views/RED_uebersicht.py",
+    title="Ligenübersicht",
+    icon=":material/layers:"
+)
+
 pg = st.navigation(
     {
         "Start" : [
@@ -270,6 +292,7 @@ pg = st.navigation(
         ],
         "Redraft" : [
             redraft_front_page,
+            redraft_overview,
             redraft_oldleagues,
             redraft_weekly_page,
             redraft_weekly_cat,

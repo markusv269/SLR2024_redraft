@@ -23,7 +23,7 @@ st.write('''
          
     Des Weiteren gibt es viele Dynasty-Ligen, die über viele Jahre hinweg bespielt werden. 
          
-    Die Gewinner jeder Liga spielen um die Marryo Larry Trophy und den Gesamtsieg.
+    Die Gewinner jeder Liga spielen um die **'MaryoLarry Trophy'** und den Gesamtsieg.
          
     #### Schön und gut, aber was soll das hier?!
     Gute Frage. Ich höre den Podcast seit gut drei Jahren. 
