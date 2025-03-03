@@ -1,11 +1,11 @@
 import streamlit as st
-from tools.methods import load_matchups, load_players, load_rosters, load_scoring_settings, load_users, get_matchup_results
+# from tools.methods import load_matchups, load_players, load_rosters, load_users, get_matchup_results
 
 st.title("Wochenkategorien")
 
-matches_df = st.session_state["matchesdf"]
-matchups_df = st.session_state["matchupsdf"]
-players_df = st.session_state["playersdf"]
+matches_df = st.session_state["session_data"]["matchesdf"]
+matchups_df = st.session_state["session_data"]["matchupsdf"]
+players_df = st.session_state["session_data"]["playersdf"]
 players_dict = {}
 for index, row in players_df.iterrows():
     players_dict[row['player_id']] = f"{row['first_name'][:1]}. {row['last_name']}"

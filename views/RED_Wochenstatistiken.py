@@ -4,9 +4,9 @@ import streamlit as st
 import requests
 import graphviz
 
-users_df = st.session_state["userdf"]
-matchups_df = st.session_state["matchupsdf"]
-rosters_df = st.session_state["rostersdf"]
+users_df = st.session_state["session_data"]["userdf"]
+matchups_df = st.session_state["session_data"]["matchupsdf"]
+rosters_df = st.session_state["session_data"]["rostersdf"]
 rosters_df = rosters_df.merge(users_df, on=['league_id', 'roster_id'], how='left')
 
 st.title("Wöchentliche Statistiken")

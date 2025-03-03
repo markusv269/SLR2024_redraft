@@ -84,10 +84,10 @@ descriptions = {
 for category, keys in categories.items():
     data = []
     for key in keys:
-        if key in st.session_state["scoring"]:
+        if key in st.session_state["session_data"]["scoring"]:
             data.append({
                 "Beschreibung": descriptions.get(key, "Keine Beschreibung verfügbar"),
-                "Punkte": st.session_state["scoring"][key]
+                "Punkte": st.session_state["session_data"]["scoring"][key]
             })
 
     if data:

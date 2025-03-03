@@ -1,8 +1,10 @@
 import streamlit as st
 from sleeper_wrapper import League, User
+from config import REDLEAGUES
 import pandas as pd
 
-red_leagues = st.session_state["redleagues"]
+
+red_leagues = REDLEAGUES
 
 league_overview = {}
 

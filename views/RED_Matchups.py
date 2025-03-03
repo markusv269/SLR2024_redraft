@@ -1,13 +1,12 @@
 import streamlit as st
-from tools.methods import load_matchups, load_players, load_rosters, load_scoring_settings, load_users, get_matchup_results
 
-users_df = load_users()
-matchups_df = load_matchups()
+users_df = st.session_state["session_data"]["userdf"]
+matchups_df = st.session_state["session_data"]["matchupsdf"]
 matchups_df = matchups_df.merge(users_df[['league_id', 'roster_id', 'display_name', 'league_name']], on=['league_id', 'roster_id'], how='left')
-rosters_df = load_rosters()
+rosters_df = st.session_state["session_data"]["rostersdf"]
 
-players_df, players_dict = load_players()
-matches_df = get_matchup_results(matchdf=matchups_df, userdf=users_df)
+players_df, players_dict = st.session_state["session_data"]["playersdf"], st.session_state["session_data"]["playersdict"]
+matches_df = st.session_state["session_data"]["matchesdf"]
 
 st.title('Matchup-Übersicht')
 st.write('''Übersicht über alle Matchups. Filter nach Woche, Liga oder bestimmten Manager (zeigt alle gewonnenen und verlorernen Spiele).

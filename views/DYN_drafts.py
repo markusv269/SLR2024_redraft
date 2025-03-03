@@ -1,8 +1,8 @@
 import streamlit as st
-from Start import display_drafts
+from config import DYNLEAGUES
+from utils import display_drafts  # Falls du die Draft-Funktion ausgelagert hast
 
 st.write('''
     # Dynasty Drafts''')
 
-dyn_leagues = st.session_state["dynleagues"]
-display_drafts(dyn_leagues)
+display_drafts(DYNLEAGUES)

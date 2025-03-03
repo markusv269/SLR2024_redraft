@@ -1,10 +1,10 @@
 import streamlit as st
-from tools.methods import load_matchups, load_players, load_rosters, load_scoring_settings, load_users, get_matchup_results
+from tools.methods import load_matchups, load_players, load_rosters, load_users, get_matchup_results
 
-users_df = load_users()
-matchups_df = load_matchups()
+users_df = st.session_state["session_data"]["userdf"]
+matchups_df = st.session_state["session_data"]["matchupsdf"]
 matchups_df = matchups_df.merge(users_df[['league_id', 'roster_id', 'display_name', 'league_name']], on=['league_id', 'roster_id'], how='left')
-rosters_df = load_rosters()
+rosters_df = st.session_state["session_data"]["rostersdf"]
 
 st.title('SLR Manager')
 
