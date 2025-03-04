@@ -2,7 +2,21 @@ import streamlit as st
 
 st.write('''
     # Das StonedLack Universum 🏈
+''')
 
+with st.expander("News und Aktuelles", icon=":material/news:", expanded=True):
+    st.write('''
+    ## News
+             
+    #### Der Montagspodcast ist zurück
+    Seit dem 03.03.2025 sind die beiden Podcaster Stoni und Lack wieder live auf Sendung und präsentieren die üblichen Offseason-Themen. In der aktuellen Folge 497 wird die Free Agency behandelt.
+             
+    Die nächste Folge wird live am 10.03.2025 um 21:30 Uhr gestreamt.
+    ''')
+
+with st.expander("About", icon=":material/question_mark:"):
+    st.write(
+        '''
     ## About
     Willkommen auf der Streamlit-Infoseite des StonedLack Fantasy Football Podcasts. 
          
@@ -40,4 +54,11 @@ st.write('''
     Wer Ideen und Wünsche hat, kann diese gern äußern und mir im Discord schreiben. Ihr wisst ja, wo Ihr mich finden könnt.😉
          
     Viel Spaß auf der Seite und bei Fantasy Football!
-''')
+    ''')
+
+with st.expander("The Universe", icon=":material/planet:"):
+    st.write('''
+    ## Das Universum
+    
+    Das Universum umfasste in der Saison 2024 über 60 Dynasty- und Redraftligen. Auf den folgenden Seiten findet ihr Einblicke zu den wöchentlichen Statistiken, Matchups, zu den Drafts etc.
+    ''')
