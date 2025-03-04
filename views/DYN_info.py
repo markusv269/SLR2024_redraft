@@ -1,6 +1,7 @@
 import streamlit as st
 from sleeper_wrapper import League, User
 import pandas as pd
+from config import DYNLEAGUES
 
 st.write(
     '''
@@ -9,7 +10,7 @@ st.write(
     '''
 )
 
-dynasty_leagues = st.session_state["dynleagues"]
+dynasty_leagues = DYNLEAGUES
 
 league_overview = {}
 
