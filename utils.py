@@ -3,6 +3,17 @@ import pandas as pd
 from datetime import datetime, timezone
 from zoneinfo import ZoneInfo
 from sleeper_wrapper import League, Drafts, User  # Falls du diese API nutzt
+import os
+import json
+
+drafts_dir = "drafts"
+picks_dir = "picks"
+
+def load_json(file_path):
+    if os.path.exists(file_path):
+        with open(file_path, "r", encoding="utf-8") as file:
+            return json.load(file)
+    return None
 
 def display_drafts(league_ids):
     for league_id in league_ids:
@@ -13,6 +24,13 @@ def display_drafts(league_ids):
         draft_id = league_data.get("draft_id")
         draft = Drafts(draft_id)
         draft_data = draft.get_specific_draft()
+        
+        # Falls der Draft-Status „complete“ ist, aus Datei laden
+        if draft_data["status"] == "complete":
+            picks = load_json(f"{picks_dir}/{draft_id}.json")
+        else:
+            picks = draft.get_all_picks()
+        
         draft_order = draft_data.get("draft_order", {})
         draft_time = draft_data.get("start_time", None)
         draft_type = draft_data["settings"].get("player_type")
@@ -37,7 +55,6 @@ def display_drafts(league_ids):
 
         st.write(f"#### {league_data['name']}")
 
-        picks = draft.get_all_picks()
         latest_pick = picks[-1] if picks else None
         
         if latest_pick:
@@ -51,6 +68,7 @@ def display_drafts(league_ids):
             ]
         else:
             pick_data = None
+
         col11, col12 = st.columns([1,4])
         with col11:
             st.write("Draftmodus")

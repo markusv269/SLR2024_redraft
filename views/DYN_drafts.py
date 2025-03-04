@@ -1,6 +1,6 @@
 import streamlit as st
 from config import DYNLEAGUES
-from utils import display_drafts  # Falls du die Draft-Funktion ausgelagert hast
+from utils import display_drafts
 
 st.write('''
     # Dynasty Drafts''')
