@@ -12,6 +12,13 @@ with st.expander("News und Aktuelles", icon=":material/news:", expanded=True):
     Seit dem 03.03.2025 sind die beiden Podcaster Stoni und Lack wieder live auf Sendung und präsentieren die üblichen Offseason-Themen. In der aktuellen Folge 497 wird die Free Agency behandelt.
              
     Die nächste Folge wird live am 10.03.2025 um 21:30 Uhr gestreamt.
+
+    #### kunfc. ist der Champ of Champs 2024
+    Mit dem Ausgang des Superbowls entschied sich auch die Frage, wer sich im Champ of Champs-Spiel durchsetzt. Letzlich ergattert sich kunfc. (sleeper: kunfc) den begehrten Titel und den Siegespreis.
+    
+    Das Champ of Champs-Spiel im Superbowl bestand aus der Auswahl von drei Spielern, deren Fantasy-Performances mit einem Faktor multipliziert wurde. Bester Fantasy Spieler der Runde war Worthy mit insgesamt 107,10 Fantasy Punkten (bei einem Faktor x3). 
+    
+    kunfc setzte auf Worthy, AJ Brown und Goedert und sammelte somit insgesamt 161,1 Fantasy Punkte, was die Verteidigung der Führung und den Gesamtsieg bedeutete. Glückwunsch zum Sieg und viel Spaß mit dem Preis.
     ''')
 
 with st.expander("About", icon=":material/question_mark:"):
