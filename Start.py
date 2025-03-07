@@ -61,7 +61,8 @@ pg = st.navigation(
         "Start": [
             st.Page(page="views/0_start.py", title="Das StonedLack Universum", icon=":material/home:", default=True),
             st.Page(page="views/1_hottakes.py", title="Hot Takes-Sammlung", icon=":material/whatshot:"),
-            st.Page(page="views/2_champofchamps.py", title="Champ of Champs", icon=":material/trophy:")
+            st.Page(page="views/2_champofchamps.py", title="Champ of Champs", icon=":material/trophy:"),
+            # st.Page(page="views/3_coc_spiel.py", title="CoC Tippabgabe", icon=":material/casino:")
         ],
         "Redraft": [
             # st.Page(page="views/RED_slr2025.py", title="SLR2025 Anmeldung", icon=":material/login:"),
