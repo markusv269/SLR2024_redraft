@@ -39,27 +39,42 @@ def get_user_id(username):
         return user.get_user_id() is not None
     except Exception:
         return False
-
-st.write("# SLR2025 Anmeldung")
-st.markdown('''
-    Dieses Formular dient zur Anmeldung bei den allseits beliebten Stoned Lack Redraft Ligen. 
-    Gespielt wird auf  Sleeper.
-    Die Zuteilung zu einer bestimmten Liga erfolgt via Auslosung Ende August 2025 im Live Stream von Stoned Lack!
-
-    Bitte tragt euch hier mit euren Kontakt-Daten ein, mit denen euch euer Commissioner nach der Auslosung in die Liga einladen kann. 
-    Bitte merkt euch wann die Auslosung ist, und dass ihr danach dann eine Einladung erhaltet  und schaut regelmäßig in Sleeper / Discord, damit die Liga zügig zustande kommt und der Draft beginnen kann.
-
-    Bitte achtet auf die genaue Schreibweise eurer Namen in Sleeper und Discord!
-
-    Eine Liga ist nichts ohne einen guten Commissioner! 
-    Wir würden uns sehr freuen, wenn sich ausreichend Freiwillige melden würden, in ihrer Liga die Rolle des Commish zu übernehmen. 
-    Erfahrung ist nicht unbedingt nötig, ihr bekommt gerne ausreichend Hilfestellung im Discord der Stoned Lack Army.
-
-    Wir freuen uns auf zahlreiche Teilnahme!
-
-    Let's go! 
-
-    _Die hier erhobenen Daten werden nur zum Zwecke und für die Dauer der Durchführung der Stoned Lack Redraft Ligen gespeichert. Durch Ausfüllen des Formulars erklärst du dich damit einverstanden, dass diese Daten zu diesem Zweck verwendet werden dürfen. Eine Auskunft über diese Daten ist jederzeit möglich._''')
+st.markdown(f'''
+    ## Anmeldung zu den **Stoned Lack Redraft Ligen 2025**
+    
+    Willkommen zur Anmeldung für die allseits beliebten **Stoned Lack Redraft Ligen**! 🏈
+    
+    Gespielt wird auf [Sleeper](https://sleeper.com/). Die Zuteilung zu einer Liga erfolgt per **Live-Auslosung Ende August 2025** im Stream von Stoned Lack!
+    
+    **🔹 Wichtige Infos zur Anmeldung:**
+    - Tragt hier eure **Kontakt-Daten** ein, mit denen euch der Commissioner nach der Auslosung einladen kann.
+    - Achtet auf die **genaue Schreibweise eurer Namen in Sleeper & Discord**.
+    - **Der Sleeper-Name ist zwingend erforderlich** und wird überprüft.
+    - Falls ihr noch keinen Sleeper-Account habt, erstellt euch einen unter: [Sleeper-Registrierung](https://sleeper.com/create).
+    
+    **⏳ Ablauf:**
+    - Nach der **Auslosung** erhaltet ihr eine **Einladung** über Sleeper oder Discord.
+    - Bitte schaut regelmäßig in **Sleeper & Discord**, damit die Liga zügig zustande kommt und der Draft starten kann.
+    
+    ---
+    
+    #### 🙌 Werde Commissioner!
+    
+    Eine Liga ist nur so gut wie ihr Commissioner! Falls du Lust hast, eine Liga zu leiten, melde dich gerne. 🏆
+    - **Erfahrung ist nicht zwingend nötig** – Unterstützung gibt’s im **Stoned Lack Army Discord**.
+    - Ohne freiwillige Commissioner gibt es keine Ligen – also trau dich! 💪
+    
+    ---
+    
+    #### ℹ️ Datenschutz & Anmeldestatus
+    
+    _Die hier erhobenen Daten werden ausschließlich zur Durchführung der Stoned Lack Redraft Ligen gespeichert und nach Ende der Saison gelöscht._
+    
+    - **Datenaktualisierung:** Falls ihr eure Anmeldung überschreiben wollt, meldet euch einfach mit dem **gleichen Sleeper-Namen** erneut an. Es zählt immer der letzte Eintrag.
+    - **Status prüfen:** Seht nach, ob eure Anmeldung erfasst wurde: [Hier klicken](/views/RED_slr2025_status).
+    
+    Wir freuen uns auf euch! **Let’s go! 🚀**
+''')
 st.write("## Melde Dich hier für die StonedLack Redraftligen 2025 an")
 commish = st.checkbox("Ich übernehme einen Commish-Posten!")
 mitspieler = st.checkbox("Ich möchte mit jemandem zusammenspielen")
@@ -87,10 +102,10 @@ with st.form("Anmeldung SLR 2025"):
         if not sleeper_name:
             errors.append("Bitte gib deinen Sleeper-Namen an.")
         elif not get_user_id(sleeper_name):
-            errors.append(f"Sleeper-Name '{sleeper_name}' nicht gefunden. Bitte überprüfe deine Eingabe.")
+            errors.append(f"Sleeper-Name '{sleeper_name}' nicht gefunden. Bitte überprüfe deine Eingabe. Noch keinen sleeper-Account? Dann melde über https://sleeper.com/create an.")
         
-        if not discord_name:
-            errors.append("Bitte gib deinen Discord-Namen an.")
+        # if not discord_name:
+        #     errors.append("Bitte gib deinen Discord-Namen an.")
         
         for name in mitspieler_names:
             if not get_user_id(name):
