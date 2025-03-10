@@ -71,7 +71,7 @@ st.markdown(f'''
     _Die hier erhobenen Daten werden ausschließlich zur Durchführung der Stoned Lack Redraft Ligen gespeichert und nach Ende der Saison gelöscht._
     
     - **Datenaktualisierung:** Falls ihr eure Anmeldung überschreiben wollt, meldet euch einfach mit dem **gleichen Sleeper-Namen** erneut an. Es zählt immer der letzte Eintrag.
-    - **Status prüfen:** Seht nach, ob eure Anmeldung erfasst wurde: [Hier klicken](/views/RED_slr2025_status).
+    - **Status prüfen:** Seht nach, ob eure Anmeldung erfasst wurde: [Hier klicken](/RED_slr2025_status).
     
     Wir freuen uns auf euch! **Let’s go! 🚀**
 ''')
