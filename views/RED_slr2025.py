@@ -40,16 +40,16 @@ def get_user_id(username):
     except Exception:
         return False
 st.markdown(f'''
-    ## Anmeldung zu den **Stoned Lack Redraft Ligen 2025**
-    
+    #### 📝 Anmeldung zu den **Stoned Lack Redraft Ligen 2025**
+            
     Willkommen zur Anmeldung für die allseits beliebten **Stoned Lack Redraft Ligen**! 🏈
-    
+            
     Gespielt wird auf [Sleeper](https://sleeper.com/). Die Zuteilung zu einer Liga erfolgt per **Live-Auslosung Ende August 2025** im Stream von Stoned Lack!
     
     **🔹 Wichtige Infos zur Anmeldung:**
-    - Tragt hier eure **Kontakt-Daten** ein, mit denen euch der Commissioner nach der Auslosung einladen kann.
+    - Tragt eure **Kontakt-Daten** ein, mit denen euch der Commissioner nach der Auslosung einladen kann.
     - Achtet auf die **genaue Schreibweise eurer Namen in Sleeper & Discord**.
-    - **Der Sleeper-Name ist zwingend erforderlich** und wird überprüft.
+    - **Der Sleeper-Name ist zwingend erforderlich** und wird überprüft, da dieser für die Zuteilung und die Mitspielerwünsche genutzt wird.
     - Falls ihr noch keinen Sleeper-Account habt, erstellt euch einen unter: [Sleeper-Registrierung](https://sleeper.com/create).
     
     **⏳ Ablauf:**
@@ -61,7 +61,7 @@ st.markdown(f'''
     #### 🙌 Werde Commissioner!
     
     Eine Liga ist nur so gut wie ihr Commissioner! Falls du Lust hast, eine Liga zu leiten, melde dich gerne. 🏆
-    - **Erfahrung ist nicht zwingend nötig** – Unterstützung gibt’s im **Stoned Lack Army Discord**.
+    - **Erfahrung ist nicht zwingend nötig** – Unterstützung gibt’s im **Stoned Lack Army Discord oder direkt in der sleeper-Liga**.
     - Ohne freiwillige Commissioner gibt es keine Ligen – also trau dich! 💪
     
     ---
@@ -70,8 +70,10 @@ st.markdown(f'''
     
     _Die hier erhobenen Daten werden ausschließlich zur Durchführung der Stoned Lack Redraft Ligen gespeichert und nach Ende der Saison gelöscht._
     
-    - **Datenaktualisierung:** Falls ihr eure Anmeldung überschreiben wollt, meldet euch einfach mit dem **gleichen Sleeper-Namen** erneut an. Es zählt immer der letzte Eintrag.
-    - **Status prüfen:** Seht nach, ob eure Anmeldung erfasst wurde: [Hier klicken](/RED_slr2025_status).
+    - **Datenaktualisierung**  
+    Falls ihr eure Anmeldung überschreiben wollt, meldet euch einfach mit dem **gleichen Sleeper-Namen** erneut an. Es zählt immer der letzte Eintrag.
+    - **Status prüfen**  
+    Seht unter SLR2025 Anmeldestatus nach, ob eure Anmeldung erfasst wurde.
     
     Wir freuen uns auf euch! **Let’s go! 🚀**
 ''')
