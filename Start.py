@@ -65,8 +65,8 @@ pg = st.navigation(
             # st.Page(page="views/3_coc_spiel.py", title="CoC Tippabgabe", icon=":material/casino:")
         ],
         "Redraft": [
-            st.Page(page="views/RED_slr2025.py", title="SLR2025 Anmeldung (Testphase)", icon=":material/login:"),
-            st.Page(page="views/RED_slr2025_status.py", title="SLR2025 Anmeldestatus (Testphase)", icon=":material/download_done:"),
+            # st.Page(page="views/RED_slr2025.py", title="SLR2025 Anmeldung", icon=":material/login:"),
+            # st.Page(page="views/RED_slr2025_status.py", title="SLR2025 Anmeldestatus", icon=":material/download_done:"),
             st.Page(page="views/RED_info.py", title="Die Redraftligen", icon=":material/home:"),
             st.Page(page="views/RED_uebersicht.py", title="Ligenübersicht", icon=":material/layers:"),
             st.Page(page="views/RED_alte_Redrafts.py", title="Send your old SLR", icon=":material/send:"),
