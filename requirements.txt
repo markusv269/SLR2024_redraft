@@ -5,3 +5,4 @@ seaborn
 pyarrow
 sleeper-api-wrapper
 graphviz
+feedparser
