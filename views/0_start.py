@@ -1,10 +1,11 @@
 import streamlit as st
+import feedparser
 
 st.write('''
     # Das StonedLack Universum 🏈
 ''')
 
-with st.expander("News und Aktuelles", icon=":material/news:", expanded=True):
+with st.expander("StonedLack News", icon=":material/news:", expanded=True):
     st.write('''
     ## News
              
@@ -20,6 +21,22 @@ with st.expander("News und Aktuelles", icon=":material/news:", expanded=True):
     
     kunfc setzte auf Worthy, AJ Brown und Goedert und sammelte somit insgesamt 161,1 Fantasy Punkte, was die Verteidigung der Führung und den Gesamtsieg bedeutete. Glückwunsch zum Sieg und viel Spaß mit dem Preis.
     ''')
+
+with st.expander("NFL News", icon=":material/news:"):
+    # URL des Rotowire NFL RSS-Feeds
+    RSS_FEED_URL = "https://www.rotowire.com/rss/news.php?sport=NFL"
+
+    def get_news():
+        feed = feedparser.parse(RSS_FEED_URL)
+        return feed.entries  # Liste der News-Artikel
+    news_entries = get_news()
+
+    for entry in news_entries:
+        st.subheader(entry.title)
+        st.write(f"📰 {entry.published}")
+        st.text(entry.summary)
+        st.markdown(f"🔗 [Zum Artikel]({entry.link})", unsafe_allow_html=True)
+        st.write("---")
 
 with st.expander("About", icon=":material/question_mark:"):
     st.write(
