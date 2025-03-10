@@ -3,7 +3,8 @@ import feedparser
 
 st.write('''
     # Das StonedLack Universum 🏈
-''')
+    Das Universum umfasste in der Saison 2024 über 60 Dynasty- und Redraftligen. Auf den folgenden Seiten findet ihr Einblicke zu den wöchentlichen Statistiken, Matchups, zu den Drafts etc.
+    ''')
 
 with st.expander("StonedLack News", icon=":material/news:", expanded=True):
     st.write('''             
@@ -79,9 +80,4 @@ with st.expander("About", icon=":material/question_mark:"):
     Wer Ideen und Wünsche hat, kann diese gern äußern und mir im Discord schreiben. Ihr wisst ja, wo Ihr mich finden könnt.😉
          
     Viel Spaß auf der Seite und bei Fantasy Football!
-    ''')
-
-with st.expander("The Universe", icon=":material/planet:"):
-    st.write('''    
-    Das Universum umfasste in der Saison 2024 über 60 Dynasty- und Redraftligen. Auf den folgenden Seiten findet ihr Einblicke zu den wöchentlichen Statistiken, Matchups, zu den Drafts etc.
     ''')
