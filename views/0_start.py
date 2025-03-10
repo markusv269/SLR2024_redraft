@@ -6,9 +6,7 @@ st.write('''
 ''')
 
 with st.expander("StonedLack News", icon=":material/news:", expanded=True):
-    st.write('''
-    ## News
-             
+    st.write('''             
     #### Der Montagspodcast ist zurück
     Seit dem 03.03.2025 sind die beiden Podcaster Stoni und Lack wieder live auf Sendung und präsentieren die üblichen Offseason-Themen. In der aktuellen Folge 497 wird die Free Agency behandelt.
              
@@ -20,6 +18,10 @@ with st.expander("StonedLack News", icon=":material/news:", expanded=True):
     Das Champ of Champs-Spiel im Superbowl bestand aus der Auswahl von drei Spielern, deren Fantasy-Performances mit einem Faktor multipliziert wurde. Bester Fantasy Spieler der Runde war Worthy mit insgesamt 107,10 Fantasy Punkten (bei einem Faktor x3). 
     
     kunfc setzte auf Worthy, AJ Brown und Goedert und sammelte somit insgesamt 161,1 Fantasy Punkte, was die Verteidigung der Führung und den Gesamtsieg bedeutete. Glückwunsch zum Sieg und viel Spaß mit dem Preis.
+    
+    #### Aktuelle Podcast-Folgen
+    - **#498 (10.03.2025)**
+    - **#497 (03.03.2025):** Free Agency Wünsche 2025 ([Youtube](https://www.youtube.com/watch?v=BgWIwJSINXI))
     ''')
 
 with st.expander("NFL News", icon=":material/news:"):
@@ -32,7 +34,7 @@ with st.expander("NFL News", icon=":material/news:"):
     news_entries = get_news()
 
     for entry in news_entries:
-        st.subheader(entry.title)
+        st.write(f"#### {entry.title}")
         st.write(f"📰 {entry.published}")
         st.text(entry.summary)
         st.markdown(f"🔗 [Zum Artikel]({entry.link})", unsafe_allow_html=True)
@@ -41,7 +43,6 @@ with st.expander("NFL News", icon=":material/news:"):
 with st.expander("About", icon=":material/question_mark:"):
     st.write(
         '''
-    ## About
     Willkommen auf der Streamlit-Infoseite des StonedLack Fantasy Football Podcasts. 
          
     _**Hinweis/Disclaimer:** Die Seite wird privat betrieben und dient nur dem Zwecke der Aufbereitung von frei zugänglichen Daten aus der sleeper-API ([Link](https://docs.sleeper.com/)).
@@ -81,8 +82,6 @@ with st.expander("About", icon=":material/question_mark:"):
     ''')
 
 with st.expander("The Universe", icon=":material/planet:"):
-    st.write('''
-    ## Das Universum
-    
+    st.write('''    
     Das Universum umfasste in der Saison 2024 über 60 Dynasty- und Redraftligen. Auf den folgenden Seiten findet ihr Einblicke zu den wöchentlichen Statistiken, Matchups, zu den Drafts etc.
     ''')
