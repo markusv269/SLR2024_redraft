@@ -81,3 +81,23 @@ with st.expander("About", icon=":material/question_mark:"):
          
     Viel Spaß auf der Seite und bei Fantasy Football!
     ''')
+
+
+with st.expander("StonedLack Podcasts", icon=":material/radio:"):
+    # RSS-Feed URL
+    RSS_FEED_URL = "https://rss.app/feeds/1APmZXFu0zC5w1m5.xml"
+
+    def fetch_rss_feed(url):
+        return feedparser.parse(url)
+
+    feed = fetch_rss_feed(RSS_FEED_URL)
+
+    if feed.entries:
+        for entry in feed.entries[:10]:  # Zeigt die letzten 10 Einträge an
+            st.write(
+                f'''
+                **{entry.title}:**  
+                [Zum Podcast]({entry.link})  ''')
+            st.markdown("---")
+    else:
+        st.write("Keine Artikel gefunden.")
