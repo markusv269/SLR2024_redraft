@@ -45,12 +45,6 @@ if st.session_state["session_data"]["matchesdf"] is None:
         userdf=st.session_state["session_data"]["userdf"]
     )
 
-# if "dynleagues" in st.session_state:
-#     display_drafts(st.session_state["dynleagues"])
-
-# if "redleagues" in st.session_state:
-#     display_drafts(st.session_state["redleagues"])
-
 # Streamlit UI
 st.image("Pictures/SL_logo.png", width=150)
 st.sidebar.write("by GoKingsGo, 2025")
@@ -79,7 +73,8 @@ pg = st.navigation(
         "Dynasty": [
             st.Page(page="views/DYN_info.py", title="Dynasty", icon=":material/construction:"),
             st.Page(page="views/DYN_drafts.py", title="Drafts", icon=":material/target:")
-        ]
+        ],
+        # "Adminbereich": []
     }
 )
 pg.run()
