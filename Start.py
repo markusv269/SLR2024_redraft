@@ -56,13 +56,15 @@ if st.session_state["session_data"]["auth"] is None:
 login_data = st.secrets["airtable"]["login"]
 st.sidebar.subheader("Adminbereich")
 username = st.sidebar.text_input("Username")
-password = st.sidebar.text_input("Password", type="password")
+password = st.sidebar.text_input("Password", type="password", placeholder=None)
 if st.sidebar.button("Login"):
     if username in login_data and login_data[username] == password:
         st.sidebar.success("Login erfolgreich!")
         st.session_state["session_data"]["auth"] = True            
     else:
         st.sidebar.error("Falsche Zugangsdaten!")
+if st.sidebar.button("Logout"):
+    st.session_state["session_data"]["auth"] = False  
 
 # Navigation
 if st.session_state["session_data"]["auth"] == True:
