@@ -9,9 +9,8 @@ st.write('''
 with st.expander("StonedLack News", icon=":material/news:", expanded=True):
     st.write('''             
     #### Der Montagspodcast ist zurück
-    Seit dem 03.03.2025 sind die beiden Podcaster Stoni und Lack wieder live auf Sendung und präsentieren die üblichen Offseason-Themen. In der aktuellen Folge 497 wird die Free Agency behandelt.
-             
-    Die nächste Folge wird live am 10.03.2025 um 21:30 Uhr gestreamt.
+    Seit dem 03.03.2025 sind die beiden Podcaster Stoni und Lack wieder live auf Sendung und präsentieren die üblichen Offseason-Themen. 
+    Die aktuellen Folgen können weiter unten abgerufen werden.
 
     #### kunfc. ist der Champ of Champs 2024
     Mit dem Ausgang des Superbowls entschied sich auch die Frage, wer sich im Champ of Champs-Spiel durchsetzt. Letzlich ergattert sich kunfc. (sleeper: kunfc) den begehrten Titel und den Siegespreis.
@@ -20,10 +19,23 @@ with st.expander("StonedLack News", icon=":material/news:", expanded=True):
     
     kunfc setzte auf Worthy, AJ Brown und Goedert und sammelte somit insgesamt 161,1 Fantasy Punkte, was die Verteidigung der Führung und den Gesamtsieg bedeutete. Glückwunsch zum Sieg und viel Spaß mit dem Preis.
     
-    #### Aktuelle Podcast-Folgen
-    - **#498 (10.03.2025)**
-    - **#497 (03.03.2025):** Free Agency Wünsche 2025 ([Youtube](https://www.youtube.com/watch?v=BgWIwJSINXI))
-    ''')
+    #### Aktuelle Podcast-Folgen''')
+    # RSS-Feed URL
+    RSS_FEED_URL = "https://www.youtube.com/feeds/videos.xml?playlist_id=PLVPzmyE6fIhQg_kqkLNoH1fd4oyv2D5X6"
+
+    def fetch_rss_feed(url):
+        return feedparser.parse(url)
+
+    feed = fetch_rss_feed(RSS_FEED_URL)
+
+    if feed.entries:
+        for entry in feed.entries[:10]:  # Zeigt die letzten 10 Einträge an
+            st.markdown(
+                f''' 
+                [{entry.title}]({entry.link})  
+                ''')
+    else:
+        st.write("Keine Artikel gefunden.")
 
 with st.expander("NFL News", icon=":material/news:"):
     # URL des Rotowire NFL RSS-Feeds
@@ -83,21 +95,4 @@ with st.expander("About", icon=":material/question_mark:"):
     ''')
 
 
-with st.expander("StonedLack Podcasts", icon=":material/radio:"):
-    # RSS-Feed URL
-    RSS_FEED_URL = "https://rss.app/feeds/1APmZXFu0zC5w1m5.xml"
-
-    def fetch_rss_feed(url):
-        return feedparser.parse(url)
-
-    feed = fetch_rss_feed(RSS_FEED_URL)
-
-    if feed.entries:
-        for entry in feed.entries[:10]:  # Zeigt die letzten 10 Einträge an
-            st.write(
-                f'''
-                **{entry.title}:**  
-                [Zum Podcast]({entry.link})  ''')
-            st.markdown("---")
-    else:
-        st.write("Keine Artikel gefunden.")
+# with st.expander("StonedLack Podcasts", icon=":material/radio:"):
