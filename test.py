@@ -1,28 +1,21 @@
-# import requests
-# from utils import AIRTABLE_API_KEY, BASE_ID
-# TABLE_NAME = "SLR2025"
+import csv
+import json
 
-# def get_airtable_fields():
-#     url = f"https://api.airtable.com/v0/{BASE_ID}/{TABLE_NAME}?maxRecords=1"
-#     headers = {"Authorization": f"Bearer {AIRTABLE_API_KEY}"}
+# Datei-Pfad anpassen
+csv_datei = "coc.csv"
 
-#     response = requests.get(url, headers=headers)
-#     if response.status_code == 200:
-#         data = response.json()
-#         if "records" in data and data["records"]:
-#             fields = data["records"][0]["fields"].keys()
-#             print("Verfügbare Spalten in Airtable:", list(fields))
-#         else:
-#             print("⚠️ Keine Einträge gefunden. Erstelle manuell einen Dummy-Eintrag in Airtable.")
-#     else:
-#         print(f"❌ Fehler {response.status_code}: {response.text}")
+# Dictionary erstellen
+data_dict = {"WC": {}, "DR": {}, "CF": {}, "SB": {}}
 
-# # Aufruf der Funktion
-# get_airtable_fields()
+# CSV-Datei einlesen und in das Dictionary umwandeln
+with open(csv_datei, mode="r", encoding="utf-8") as file:
+    reader = csv.reader(file)  # Falls Tab als Trennzeichen
 
-import streamlit as st
-cols = st.columns(3)
-filters = ["Position", "Name", "Points"]
+    for row in reader:
+        name = row[0]  # Spielername als Key im Dictionary
+        data_dict["WC"][name] = {"QB": row[1], "RB": row[2], "WR": row[3], "TE": row[4]}
+        data_dict["DR"][name] = {"QB": row[5], "RB": row[6], "WR": row[7], "TE": row[8]}
+        data_dict["CF"][name] = {"QB": row[9], "RB": row[10], "WR": row[11], "TE": row[12]}
+        data_dict["SB"][name] = {"Player1": row[13], "Player2": row[14], "Player3": row[15]}
 
-for by, col in zip(filters, cols):
-    select = col.multiselect(by)
+print(data_dict)
