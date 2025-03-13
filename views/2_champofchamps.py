@@ -55,8 +55,7 @@ def ind_calculate_fantasy_points_and_sort(json_file, round_player_data, scoring_
     # Position sortieren mit benutzerdefinierter Reihenfolge und Preis absteigend
     df["Position"] = pd.Categorical(df["Position"], categories=position_order, ordered=True)
     df = df.sort_values(by=["Position", "Preis"], ascending=[True, False])
-    df = df[['player_id', "Spieler", "Position", "Gruppe", "FFP"]].set_index("player_id")
-    # df = df.groupby(["Gruppe", "Position"]).sum("FFP").reset_index()
+    df = df[['player_id', "Spieler", "Position", "Gruppe", "FFP", "Preis"]].set_index("player_id")
 
     return df
 
@@ -98,6 +97,7 @@ st.write("## Conference Finals")
 st.write("### Tippbild")
 st.image("Pictures/CC.jfif", width=500)
 cf_df = ind_calculate_fantasy_points_and_sort("views/CoC/cf.json", conf_round_player, scoring_settings)
+# cf_df = cf_df.groupby(["Position", "Gruppe", "Preis"]).sum("FFP").reset_index()
 st.write("### Fantasyergebnisse")
 st.dataframe(cf_df, hide_index=True)
 
