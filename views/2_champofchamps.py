@@ -97,9 +97,28 @@ st.write("## Conference Finals")
 st.write("### Tippbild")
 st.image("Pictures/CC.jfif", width=500)
 cf_df = ind_calculate_fantasy_points_and_sort("views/CoC/cf.json", conf_round_player, scoring_settings)
+# QB einzeln
+qb_df = cf_df[cf_df['Position'] == 'QB']
+
+# RB und WR zusammenfassen nach Teams
+rb_wr_df = cf_df[cf_df['Position'].isin(['RB', 'WR'])]
+rb_wr_df = rb_wr_df.groupby(['Gruppe', 'Position']).agg({'FFP': 'sum', 'Preis': 'first'}).reset_index()
+rb_wr_df = rb_wr_df[rb_wr_df['Position'].isin(['RB', 'WR'])]  # Filtere nach der Gruppierung
+rb_wr_df["Spieler"] = rb_wr_df['Gruppe'].astype(str) + " " + rb_wr_df['Position'].astype(str) + "s"
+# TE einzeln
+te_df = cf_df[cf_df['Position'] == 'TE']
+
+# Alle Daten zusammenführen
+final_df = pd.concat([qb_df[['Spieler', 'Position', 'Gruppe', 'FFP', 'Preis']], rb_wr_df[['Spieler', 'Gruppe', 'Position', 'FFP', 'Preis']], te_df[['Spieler', 'Position', 'Gruppe', 'FFP', 'Preis']]])
+
+final_df = final_df.sort_values(by=['Position', 'Preis'], ascending=[True, False]).reset_index(drop=True)
+
+
 # cf_df = cf_df.groupby(["Position", "Gruppe", "Preis"]).sum("FFP").reset_index()
 st.write("### Fantasyergebnisse")
-st.dataframe(cf_df, hide_index=True)
+
+
+st.dataframe(final_df, hide_index=True)
 
 # Super Bowl
 st.write("## Super Bowl LIX")
@@ -108,3 +127,8 @@ st.image("Pictures/SB.jfif", width=500)
 cont_sb = st.container()
 # sb_df = calculate_fantasy_points("views/CoC/sb.json", super_bowl_challenge, scoring_settings)
 # cont_sb.dataframe(sb_df.set_index("player_id"), hide_index=True)
+
+rb_wr_df = cf_df[cf_df['Position'].isin(['RB', 'WR'])]
+rb_wr_df = rb_wr_df.groupby(['Gruppe', 'Position'])['FFP'].sum().reset_index()
+rb_wr_df = rb_wr_df[rb_wr_df['Position'].isin(['RB', 'WR'])]  # Filtere nach der Gruppierung
+st.write(rb_wr_df['Position'].unique())
