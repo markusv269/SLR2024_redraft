@@ -95,7 +95,7 @@ st.markdown("### Wähle eine oder mehrere Ligen aus:")
 selected_league_names = st.multiselect(
     "Ligen auswählen",
     options=league_names,
-    default=league_names  # Standardmäßig alle Ligen ausgewählt
+    # default=league_names  # Standardmäßig alle Ligen ausgewählt
 )
 
 # Umwandlung der ausgewählten Liganamen in die zugehörigen League IDs

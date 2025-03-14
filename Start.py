@@ -1,4 +1,5 @@
 import streamlit as st
+st.set_page_config(layout="wide")
 from tools.methods import (
     load_matchups, load_players, load_rosters, load_users, get_matchup_results
 )
