@@ -53,7 +53,7 @@ st.sidebar.write("by GoKingsGo, 2025")
 if st.session_state["session_data"]["auth"] is None:
     st.session_state["session_data"]["auth"] = False
 
-login_data = st.secrets["airtable"]["login"]
+login_data = st.secrets["login"]["login"]
 st.sidebar.subheader("Adminbereich")
 username = st.sidebar.text_input("Username")
 password = st.sidebar.text_input("Password", type="password", placeholder=None)
