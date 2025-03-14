@@ -29,7 +29,7 @@ with st.expander("StonedLack News", icon=":material/news:", expanded=True):
     feed = fetch_rss_feed(RSS_FEED_URL)
 
     if feed.entries:
-        for entry in feed.entries[:10]:  # Zeigt die letzten 10 Einträge an
+        for entry in feed.entries[:5]:  # Zeigt die letzten 10 Einträge an
             st.markdown(
                 f''' 
                 [{entry.title}]({entry.link})  
@@ -37,7 +37,7 @@ with st.expander("StonedLack News", icon=":material/news:", expanded=True):
     else:
         st.write("Keine Artikel gefunden.")
 
-with st.expander("NFL News", icon=":material/news:"):
+with st.expander("NFL News", icon=":material/news:", expanded=True):
     # URL des Rotowire NFL RSS-Feeds
     RSS_FEED_URL = "https://www.rotowire.com/rss/news.php?sport=NFL"
 
