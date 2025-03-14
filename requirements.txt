@@ -6,3 +6,5 @@ pyarrow
 sleeper-api-wrapper
 graphviz
 feedparser
+networkx
+st-link-analysis
