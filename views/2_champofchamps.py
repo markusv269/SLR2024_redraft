@@ -155,6 +155,6 @@ for player in sb_data:
             player_data["FFP SB-Game"] = player_data["FFP 1x"] * player_data["Multiplikator"]
             data.append(player_data)
 data_df = pd.DataFrame(data)
-st.dataframe(data_df.sort_values(by=["Multiplikator", "Position"], ascending=[True, True]).set_index("player_id"), hide_index=True)
+st.dataframe(data_df[["player_id", "Spieler", "Position", "FFP 1x", "Multiplikator", "FFP SB-Game"]].sort_values(by=["Multiplikator", "Position"], ascending=[True, True]).set_index("player_id"), hide_index=True)
 # sb_df = calculate_fantasy_points("views/CoC/sb.json", super_bowl_challenge, scoring_settings)
 # cont_sb.dataframe(sb_df.set_index("player_id"), hide_index=True)
