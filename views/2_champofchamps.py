@@ -82,7 +82,7 @@ st.write("### Tippbild")
 st.image("Pictures/WC.jfif", width=500)
 wc_df = ind_calculate_fantasy_points_and_sort("views/CoC/wc.json", wc_round_player, scoring_settings)
 st.write("### Fantasyergebnisse")
-st.dataframe(wc_df, hide_index=True)
+st.dataframe(wc_df[[column for column in wc_df.columns if column != "Gruppe"]], hide_index=True)
 
 # Divisional Round
 st.write("## Divisional Round")
@@ -90,7 +90,8 @@ st.write("### Tippbild")
 st.image("Pictures/DR.png", width=500)
 dr_df = ind_calculate_fantasy_points_and_sort("views/CoC/dr.json", div_round_player, scoring_settings)
 st.write("### Fantasyergebnisse")
-st.dataframe(dr_df, hide_index=True)
+st.dataframe(dr_df[[column for column in dr_df.columns if column != "Gruppe"]], hide_index=True)
+
 
 # Conference Finals
 st.write("## Conference Finals")
@@ -118,17 +119,42 @@ final_df = final_df.sort_values(by=['Position', 'Preis'], ascending=[True, False
 st.write("### Fantasyergebnisse")
 
 
-st.dataframe(final_df, hide_index=True)
+st.dataframe(final_df[[column for column in final_df.columns if column != "Gruppe"]], hide_index=True)
 
 # Super Bowl
 st.write("## Super Bowl LIX")
 st.write("### Tippbild")
 st.image("Pictures/SB.jfif", width=500)
 cont_sb = st.container()
+
+with open("views/CoC/sb.json",encoding="utf-8") as f:
+    sb_data = json.load(f)
+
+valid_player_ids = {str(data[2]): data[1] for data in super_bowl_challenge}
+data = []
+for player in sb_data:
+        if player["player_id"] in valid_player_ids:
+            player_name = player['player'].get("first_name", "") + " " + player['player'].get("last_name", "")
+            player_data = {
+                "player_id": player["player_id"],
+                "Spieler": player_name,  # Spielernamen hinzufügens
+                "Position": player["player"]["position"],
+                "Gruppe": player["team"],
+                "FFP 1x": 0,
+                "Multiplikator": valid_player_ids[player["player_id"]],
+                "FFP SB-Game": 0
+            }
+
+            fantasy_points = 0
+            for key, multiplier in scoring_settings.items():
+                stat_value = player.get("stats", {}).get(key, 0)  # Falls Wert fehlt, setze 0
+                player_data[key] = stat_value
+                fantasy_points += stat_value * multiplier  # Punkte berechnen
+            # Finalen Punktestand speichern
+            player_data["FFP 1x"] = round(fantasy_points, 2)  # Runden für bessere Lesbarkeit
+            player_data["FFP SB-Game"] = player_data["FFP 1x"] * player_data["Multiplikator"]
+            data.append(player_data)
+data_df = pd.DataFrame(data)
+st.dataframe(data_df.sort_values(by=["Multiplikator", "Position"], ascending=[True, True]).set_index("player_id"), hide_index=True)
 # sb_df = calculate_fantasy_points("views/CoC/sb.json", super_bowl_challenge, scoring_settings)
 # cont_sb.dataframe(sb_df.set_index("player_id"), hide_index=True)
-
-rb_wr_df = cf_df[cf_df['Position'].isin(['RB', 'WR'])]
-rb_wr_df = rb_wr_df.groupby(['Gruppe', 'Position'])['FFP'].sum().reset_index()
-rb_wr_df = rb_wr_df[rb_wr_df['Position'].isin(['RB', 'WR'])]  # Filtere nach der Gruppierung
-st.write(rb_wr_df['Position'].unique())
