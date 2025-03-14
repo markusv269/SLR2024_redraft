@@ -1,9 +1,8 @@
 import streamlit as st
-import networkx as nx
 from st_link_analysis import st_link_analysis, NodeStyle, EdgeStyle
 import requests
 from config import DYNLEAGUES, REDLEAGUES
-# st.set_page_config(layout="wide")
+
 # Vorgegebene Ligen
 LEAGUE_IDS = DYNLEAGUES + REDLEAGUES
 st.title("Das StonedLack Universum")
