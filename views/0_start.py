@@ -7,7 +7,11 @@ st.write('''
     ''')
 
 with st.expander("StonedLack News", icon=":material/news:", expanded=True):
-    st.write('''             
+    st.write('''   
+    #### Stoned Lack Dynasty 32 gegründet
+    Die neue Fantasy Saison ist noch eine Weile hin, doch die Vorfreude ist bereits spürbar. Mit der Stoned Lack Dynasty 32 wurde nun eine weitere SL Liga gegründet. 
+    Altbekannte und neue Manager werden dann ab September ihre Teams gegeneinander antreten lassen.     
+              
     #### Der Montagspodcast ist zurück
     Seit dem 03.03.2025 sind die beiden Podcaster Stoni und Lack wieder live auf Sendung und präsentieren die üblichen Offseason-Themen. 
     Die aktuellen Folgen können weiter unten abgerufen werden.

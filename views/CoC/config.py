@@ -252,50 +252,6 @@ div_round_player = {
     'Ertz': {'player_id': '1339', 'price': 0, 'position': 'TE', 'points': 0}
 }
 
-# conf_round_player = {
-#     'Allen': {'Allen':{'player_id': '4984', 'price': 5, 'position': 'QB', 'points': 0}},
-#     'Daniels': {'Daniels':{'player_id': '11566', 'price': 3, 'position': 'QB', 'points': 0}},
-#     'Hurts': {'Hurts':{'player_id': '6904', 'price': 1, 'position': 'QB', 'points': 0}},
-#     'Mahomes': {'Mahomes':{'player_id': '4046', 'price': 0, 'position': 'QB', 'points': 0}},
-#     'PHI RBs':{
-#         'Barkley': {'player_id': '4866', 'price': 5, 'position': 'RB', 'points': 0},
-#         'Gainwell': {'player_id': '7567', 'price': 5, 'position': 'RB', 'points': 0}
-#         },
-#     'BUF RBs':{
-#         'Cook': {'player_id': '8138', 'price': 3, 'position': 'RB', 'points': 0},
-#         'Davis': {'player_id': '11575', 'price': 3, 'position': 'RB', 'points': 0}
-#         },
-#     'WAS RBs':{
-#         'Robinson': {'player_id': '8154', 'price': 1, 'position': 'RB', 'points': 0},
-#         'Ekeler': {'player_id': '4663', 'price': 1, 'position': 'RB', 'points': 0}
-#         },
-#     'KC RBs':{
-#         'Pacheco': {'player_id': '8205', 'price': 0, 'position': 'RB', 'points': 0},
-#         'Hunt': {'player_id': '4098', 'price': 0, 'position': 'RB', 'points': 0}
-#         },
-#     'PHI WRs':{
-#         'AJ Brown': {'player_id': '5859', 'price': 5, 'position': 'WR', 'points': 0},
-#         'Smith': {'player_id': '7525', 'price': 5, 'position': 'WR', 'points': 0}
-#         },
-#     'WAS WRs':{
-#         'McLaurin': {'player_id': '5927', 'price': 3, 'position': 'WR', 'points': 0},
-#         'Brown': {'player_id': '7587', 'price': 3, 'position': 'WR', 'points': 0}
-#     },
-#     'KC WRs':{
-#         'Worthy': {'player_id': '11624', 'price': 1, 'position': 'WR', 'points': 0},
-#         'Brown': {'player_id': '5848', 'price': 1, 'position': 'WR', 'points': 0}
-#     },
-#     'BUF WRs':{
-#         'Cooper': {'player_id': '2309', 'price': 0, 'position': 'WR', 'points': 0},
-#         'Shakir': {'player_id': '8134', 'price': 0, 'position': 'WR', 'points': 0}
-#     },
-#     'Kelce': {'Kelce':{'player_id': '1466', 'price': 5, 'position': 'TE', 'points': 0}},
-#     'Ertz': {'Ertz':{'player_id': '1339', 'price': 3, 'position': 'TE', 'points': 0}},
-#     'Goedert': {'Goedert':{'player_id': '5022', 'price': 1, 'position': 'TE', 'points': 0}},
-#     'Kincaid': {'Kincaid':{'player_id': '10236', 'price': 0, 'position': 'TE', 'points': 0}}
-# }
-
-
 conf_round_player = {
     'Allen': {'player_id': '4984', 'price': 5, 'position': 'QB', 'points': 0, 'group': 'QB'},
     'Daniels': {'player_id': '11566', 'price': 3, 'position': 'QB', 'points': 0, 'group': 'QB'},
@@ -323,17 +279,28 @@ conf_round_player = {
     'Kincaid': {'player_id': '10236', 'price': 0, 'position': 'TE', 'points': 0, 'group': 'TEs'}
 }
 
-super_bowl_challenge = [
-    ["Hurts", 1, 6904],
-    ["Mahomes", 1, 4046],
-    ["Kelce", 1, 1466],
-    ["Barkley", 1, 4866],
-    ["Worthy", 3, 11624],
-    ["Smith", 3, 7525],
-    ["AJ Brown", 3, 5859],
-    ["Goedert", 3, 5022],
-    ["Pacheco", 5, 8205],
-    ["Hunt", 5, 4098],
-    ["Butker", 5, 4227],
-    ["Schuster", 5, 4040]
-]
+conf_round_groups = {
+    "PHI RBs": ['4866', '7567'],
+    "BUF RBs": ['8138', '11575'],
+    "WAS RBs": ['8154', '4663'],
+    "KC RBs": ['8205', '4098'],
+    "PHI WRs": ['5859', '7525'],
+    "WAS WRs": ['5927', '7587'],
+    "KC WRs": ['11624', '5848'],
+    "BUF WRs": ['2309', '8134']
+}
+
+super_bowl_player = {
+    'Hurts': {'player_id': '6904', 'multiplikator': 1, 'position': 'QB', 'points': 0, 'group': 'PHI QB'},
+    'Mahomes': {'player_id': '4046', 'multiplikator': 1, 'position': 'QB', 'points': 0, 'group': 'KC QB'},
+    'Kelce': {'player_id': '1466', 'multiplikator': 1, 'position': 'TE', 'points': 0, 'group': 'KC TEs'},
+    'Barkley': {'player_id': '4866', 'multiplikator': 1, 'position': 'RB', 'points': 0, 'group': 'PHI RBs'},
+    'Worthy': {'player_id': '11624', 'multiplikator': 3, 'position': 'WR', 'points': 0, 'group': 'KC WRs'},
+    'Smith': {'player_id': '7525', 'multiplikator': 3, 'position': 'WR', 'points': 0, 'group': 'PHI WRs'},
+    'AJ Brown': {'player_id': '5859', 'multiplikator': 3, 'position': 'WR', 'points': 0, 'group': 'PHI WRs'},
+    'Goedert': {'player_id': '5022', 'multiplikator': 3, 'position': 'TE', 'points': 0, 'group': 'PHI TEs'},
+    'Pacheco': {'player_id': '8205', 'multiplikator': 5, 'position': 'RB', 'points': 0, 'group': 'KC RBs'},
+    'Hunt': {'player_id': '4098', 'multiplikator': 5, 'position': 'RB', 'points': 0, 'group': 'KC RBs'},
+    'Butker': {'player_id': '4227', 'multiplikator': 5, 'position': 'K', 'points': 0, 'group': 'KC Kicker'},
+    'Schuster': {'player_id': '4040', 'multiplikator': 5, 'position': 'WR', 'points': 0, 'group': 'KC WRs'}
+}
