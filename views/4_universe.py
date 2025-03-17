@@ -47,7 +47,7 @@ def prepare_data(selected_leagues=None, search_query=None):
         users = get_users_from_league(league_id)
         
         # Füge einen Knoten für jede Liga hinzu, mit dem Namen der Liga
-        nodes.append({"data": {"id": f"league_{league_id}", "label": "LEAGUE", "Name": league_name, "Draft-ID":draft_id}})
+        nodes.append({"data": {"id": f"league_{league_id}", "label": "LEAGUE", "name": league_name, "Draft-ID":draft_id}})
         
         for user in users:
             if search_query and search_query.lower() not in user['display_name'].lower():
@@ -56,7 +56,7 @@ def prepare_data(selected_leagues=None, search_query=None):
             display_name = user['display_name']
             
             # Füge einen Knoten für jeden Benutzer hinzu
-            nodes.append({"data": {"id": f"user_{user_id}", "label": "USER", "Name": display_name}})
+            nodes.append({"data": {"id": f"user_{user_id}", "label": "USER", "name": display_name}})
             
             # Füge eine Kante von der Liga zum Benutzer hinzu
             edges.append({"data": {"id": f"edge_{league_id}_{user_id}", "label": "PARTICIPATES", "source": f"league_{league_id}", "target": f"user_{user_id}"}})
