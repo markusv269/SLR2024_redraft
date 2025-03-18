@@ -2,8 +2,11 @@ import streamlit as st
 
 with st.expander("Sleeper Trending Players"):
     # Setze den Titel der App
-    hours = st.slider("Zeitraum angeben (h)", min_value=6, step=6, max_value=7*24)
-    player = st.slider("Anzahl der angezeigten Spieler", min_value=5, max_value=25)
+    col1, col2 = st.columns(2)
+    with col1:
+        hours = st.slider("Zeitraum angeben (h)", min_value=6, step=6, max_value=7*24)
+    with col2:
+        player = st.slider("Anzahl der angezeigten Spieler", min_value=5, max_value=25)
 
     # Einbetten des Sleeper-Widgets mit einem IFrame
     sleeper_url = "https://sleeper.app/embed/players/nfl/trending/{}?lookback_hours={}&limit={}"
