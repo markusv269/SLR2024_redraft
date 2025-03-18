@@ -103,6 +103,3 @@ with st.expander("About", icon=":material/question_mark:"):
         
     Viel Spaß auf der Seite und bei Fantasy Football!
     ''')
-
-
-# with st.expander("StonedLack Podcasts", icon=":material/radio:"):

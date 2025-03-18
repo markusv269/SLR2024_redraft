@@ -75,7 +75,8 @@ if st.session_state["session_data"]["auth"] == True:
                 st.Page(page="views/0_start.py", title="Das StonedLack Universum", icon=":material/home:", default=True),
                 st.Page(page="views/1_hottakes.py", title="Hot Takes-Sammlung", icon=":material/whatshot:"),
                 st.Page(page="views/2_champofchamps.py", title="Champ of Champs", icon=":material/trophy:"),
-                st.Page(page="views/3_coc_spiel.py", title="CoC Tippabgabe", icon=":material/casino:")
+                st.Page(page="views/3_coc_spiel.py", title="CoC Tippabgabe", icon=":material/casino:"),
+                st.Page(page="views/5_sleeper_ecke.py", title="Sleeper Ecke", icon=":material/bedtime:")
             ],
             "Redraft": [
                 st.Page(page="views/RED_slr2025.py", title="SLR2025 Anmeldung", icon=":material/login:"),
@@ -102,7 +103,8 @@ else:
             st.Page(page="views/0_start.py", title="Das StonedLack Universum", icon=":material/home:", default=True),
             st.Page(page="views/1_hottakes.py", title="Hot Takes-Sammlung", icon=":material/whatshot:"),
             st.Page(page="views/2_champofchamps.py", title="Champ of Champs", icon=":material/trophy:"),
-            st.Page(page="views/4_universe.py", title="Das Universum", icon=":material/planet:")
+            st.Page(page="views/4_universe.py", title="Das Universum", icon=":material/planet:"),
+            st.Page(page="views/5_sleeper_ecke.py", title="Sleeper Ecke", icon=":material/bedtime:")
         ],
         "Redraft": [
             st.Page(page="views/RED_info.py", title="Die Redraftligen", icon=":material/home:"),
