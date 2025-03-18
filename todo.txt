@@ -2,6 +2,8 @@
 https://discuss.streamlit.io/t/view-all-st-navigation-pages-by-default/80712
 
 # Champ of Champs Seite füllen
+Tipps und Ergebnisse verknüpfen
+Standings anzeigen
 
 # Navigation weiter unterteilen 
 ## Idee: mehrere Unterkategorien (Jahre)
@@ -17,3 +19,7 @@ https://docs.streamlit.io/develop/tutorials/multipage/dynamic-navigation
 ## Pivot-Tabelle für Statistiken
 
 # Wochenübersichts Diagramm in Wochenstatistiken
+
+# Readme erstellen
+
+# Datenstruktur/Ordner aufräumen bzw. ordnen

@@ -8,21 +8,27 @@ st.write('''
 
 with st.expander("StonedLack News", icon=":material/news:", expanded=True):
     st.write('''   
-    #### Stoned Lack Dynasty 32 gegründet
+    #### Stoned Lack bei der American Football Madness in Düsseldorf dabei
+    Wie die beiden am Montag im Podcast verrieten, wird im Rahmen der American Football Madness (AFM) in Düsseldorf am 31.05.2025 ein Live-Podcast von Stoned Lack aufgenommen. 
+    Tickets und Infos zum Event gibt es unter folgendem [Link](https://www.americanfootballmadness.de/).
+    
+    ---
+             
+    #### Neue Stoned Lack Dynasty-Liga gegründet
     Die neue Fantasy Saison ist noch eine Weile hin, doch die Vorfreude ist bereits spürbar. Mit der Stoned Lack Dynasty 32 wurde nun eine weitere SL Liga gegründet. 
     Altbekannte und neue Manager werden dann ab September ihre Teams gegeneinander antreten lassen.     
-              
-    #### Der Montagspodcast ist zurück
-    Seit dem 03.03.2025 sind die beiden Podcaster Stoni und Lack wieder live auf Sendung und präsentieren die üblichen Offseason-Themen. 
-    Die aktuellen Folgen können weiter unten abgerufen werden.
 
+    ---
+      
     #### kunfc. ist der Champ of Champs 2024
     Mit dem Ausgang des Superbowls entschied sich auch die Frage, wer sich im Champ of Champs-Spiel durchsetzt. Letzlich ergattert sich kunfc. (sleeper: kunfc) den begehrten Titel und den Siegespreis.
     
     Das Champ of Champs-Spiel im Superbowl bestand aus der Auswahl von drei Spielern, deren Fantasy-Performances mit einem Faktor multipliziert wurde. Bester Fantasy Spieler der Runde war Worthy mit insgesamt 107,10 Fantasy Punkten (bei einem Faktor x3). 
     
     kunfc setzte auf Worthy, AJ Brown und Goedert und sammelte somit insgesamt 161,1 Fantasy Punkte, was die Verteidigung der Führung und den Gesamtsieg bedeutete. Glückwunsch zum Sieg und viel Spaß mit dem Preis.
-    
+  
+    ---
+        
     #### Aktuelle Podcast-Folgen''')
     # RSS-Feed URL
     RSS_FEED_URL = "https://www.youtube.com/feeds/videos.xml?playlist_id=PLVPzmyE6fIhQg_kqkLNoH1fd4oyv2D5X6"
