@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 import json
-from views.CoC.config import COC, scoring_settings, wc_round_player, div_round_player, conf_round_player, super_bowl_player
+from DATA_PERMANENT._2024.COC.config import COC, scoring_settings, wc_round_player, div_round_player, conf_round_player, super_bowl_player
 
 # Benutzerdefinierte Sortierreihenfolge für Positionen
 position_order = ["QB", "RB", "WR", "TE"]
@@ -79,16 +79,16 @@ st.table(scoring_settings)
 # Wild Card Weekend
 st.write("## Wild Card Weekend")
 st.write("### Tippbild")
-st.image("Pictures/WC.jfif", width=500)
-wc_df = ind_calculate_fantasy_points_and_sort("views/CoC/wc.json", wc_round_player, scoring_settings)
+st.image("Pictures/2024/CoC/WC.jfif", width=500)
+wc_df = ind_calculate_fantasy_points_and_sort("DATA_PERMANENT/_2024/COC/wc.json", wc_round_player, scoring_settings)
 st.write("### Fantasyergebnisse")
 st.dataframe(wc_df[[column for column in wc_df.columns if column != "Gruppe"]], hide_index=True)
 
 # Divisional Round
 st.write("## Divisional Round")
 st.write("### Tippbild")
-st.image("Pictures/DR.png", width=500)
-dr_df = ind_calculate_fantasy_points_and_sort("views/CoC/dr.json", div_round_player, scoring_settings)
+st.image("Pictures/2024/CoC/DR.png", width=500)
+dr_df = ind_calculate_fantasy_points_and_sort("DATA_PERMANENT/_2024/COC/dr.json", div_round_player, scoring_settings)
 st.write("### Fantasyergebnisse")
 st.dataframe(dr_df[[column for column in dr_df.columns if column != "Gruppe"]], hide_index=True)
 
@@ -96,8 +96,8 @@ st.dataframe(dr_df[[column for column in dr_df.columns if column != "Gruppe"]], 
 # Conference Finals
 st.write("## Conference Finals")
 st.write("### Tippbild")
-st.image("Pictures/CC.jfif", width=500)
-cf_df = ind_calculate_fantasy_points_and_sort("views/CoC/cf.json", conf_round_player, scoring_settings)
+st.image("Pictures/2024/CoC/CC.jfif", width=500)
+cf_df = ind_calculate_fantasy_points_and_sort("DATA_PERMANENT/_2024/COC/cf.json", conf_round_player, scoring_settings)
 # QB einzeln
 qb_df = cf_df[cf_df['Position'] == 'QB']
 
@@ -119,10 +119,10 @@ st.dataframe(final_df[[column for column in final_df.columns if column != "Grupp
 # Super Bowl
 st.write("## Super Bowl LIX")
 st.write("### Tippbild")
-st.image("Pictures/SB.jfif", width=500)
+st.image("Pictures/2024/CoC/SB.jfif", width=500)
 cont_sb = st.container()
 
-with open("views/CoC/sb.json",encoding="utf-8") as f:
+with open("DATA_PERMANENT/_2024/COC/sb.json",encoding="utf-8") as f:
     sb_data = json.load(f)
 
 # valid_player_ids = {str(data[2]): data[1] for data in super_bowl_player}
@@ -156,7 +156,7 @@ with open("views/CoC/sb.json",encoding="utf-8") as f:
 # cont_sb.dataframe(sb_df.set_index("player_id"), hide_index=True)
 
 st.write("### Tippabgaben")
-with open("views/CoC/coc.csv", "r", ) as f:
+with open("DATA_PERMANENT/_2024/COC/coc.csv", "r", ) as f:
     tips = pd.read_csv(f)
 st.write("#### Wildcard Weekend")
 st.dataframe(tips[["Name", "QB WC", "RB WC", "WR WC", "TE WC"]].set_index("Name"))
