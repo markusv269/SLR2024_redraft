@@ -25,8 +25,18 @@ def display_drafts(league_ids):
     ''')
     for league_id in league_ids:
         league = League(league_id)
-        league_data = league.get_league()
-        roster_data = league.get_rosters()
+        # league_data = league.get_league()
+
+        try:
+            league_data = league.get_league()
+        except requests.exceptions.HTTPError as e:
+            st.error(f"Fehler beim Abrufen der Liga {league_id}: {e}")
+            continue  # Liga überspringen, falls sie nicht existiert oder ein Fehler auftritt
+
+        if not isinstance(league_data, dict):  
+            st.error(f"Liga {league_id} existiert nicht mehr oder ungültige Antwort erhalten.")
+            continue
+        # roster_data = league.get_rosters()
         
         draft_id = league_data.get("draft_id")
         draft = Drafts(draft_id)
@@ -132,7 +142,6 @@ def display_drafts(league_ids):
                         st.table(draft_df.set_index("Draft Position"))
                 else:
                     st.write("No draft order available.")
-
 
 BASE_ID = st.secrets["airtable"]["base_id"]
 AIRTABLE_API_KEY = st.secrets["airtable"]["api_key"]
