@@ -74,7 +74,7 @@ if st.session_state["session_data"]["auth"] == True:
             "Start": [
                 st.Page(page="VIEWS/START/0_start.py", title="Das StonedLack Universum", icon=":material/home:", default=True),
                 st.Page(page="VIEWS/START/1_hottakes.py", title="Hot Takes-Sammlung", icon=":material/whatshot:"),
-                st.Page(page="VIEWS/START/2_champofchamps.py", title="Champ of Champs", icon=":material/trophy:"),
+                st.Page(page="VIEWS/START/2_champofchamps copy.py", title="Champ of Champs", icon=":material/trophy:"),
                 st.Page(page="VIEWS/START/3_coc_spiel.py", title="CoC Tippabgabe", icon=":material/casino:"),
                 st.Page(page="VIEWS/START/5_sleeper_ecke.py", title="Sleeper Ecke", icon=":material/bedtime:")
             ],
@@ -102,7 +102,7 @@ else:
         "Start": [
             st.Page(page="VIEWS/START/0_start.py", title="Das StonedLack Universum", icon=":material/home:", default=True),
             st.Page(page="VIEWS/START/1_hottakes.py", title="Hot Takes-Sammlung", icon=":material/whatshot:"),
-            st.Page(page="VIEWS/START/2_champofchamps.py", title="Champ of Champs", icon=":material/trophy:"),
+            st.Page(page="VIEWS/START/2_champofchamps copy.py", title="Champ of Champs", icon=":material/trophy:"),
             st.Page(page="VIEWS/START/4_universe.py", title="Das Universum", icon=":material/planet:"),
             st.Page(page="VIEWS/START/5_sleeper_ecke.py", title="Sleeper Ecke", icon=":material/bedtime:")
         ],
